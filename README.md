@@ -5,6 +5,8 @@
 
 Happy LaTeXing！~
 
+![](./screenshot/flowchart.png)
+
 ## 注意
 
 1. 本文档要求 TeXLive、MacTeX、MikTeX 不低于 2018 年的发行版，并且尽可能升级到最新，强烈建议使用TeXLive2019。
