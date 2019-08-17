@@ -1,0 +1,93 @@
+\begin{frame}[fragile]{if-else结构}{if结构} %must using [fragile]
+  \begin{itemize}
+  \item 对三个整型数\alert{从大到小}排序
+  \end{itemize}
+  \begin{center}
+    \begin{tikzpicture}[font=\scriptsize]
+      \tikzset{ coord/.style={coordinate} }
+      \begin{scope}[scale = 0.8, every node/.append style = {transform
+          shape}]%transform canvas = {scale=0.8}, overlay
+        % 布置结点单元
+        \node [term] (st1) at (0, 0) {Begin};
+        \node [io, join] (i1) {Input a, b, c};
+        \node [io, join] (o1) {Output a, b, c};
+        \node [proc, join] (p0) {\alert{Sort()}};
+        \node [io, join] (o2) {Output a, b, c};
+        \node [term, join] (end1) {End};
+      \end{scope}
+      \begin{scope}[scale = 0.8, every node/.append style = {transform
+          shape}]%transform canvas = {scale=0.8}, overlay
+        \node [term, right =3.5 of st1, shift={(0.0cm, 1.0cm)}] (st2)
+        {Begin};
+        \node [test, join] (t1) {a < b};
+        \node [test, below = 2.5 of t1] (t2) {a < c};
+        \node [test, below = 2.5 of t2] (t3) {b < c};
+        \node [term, below = 2.0 of t3] (end2) {End};
+        \node [proc, right = 2.0 of t1, shift={(0.0cm, -0.8cm)}] (p1) {Swap(a, b)};
+        \node [proc, right = 2.0 of t2, shift={(0.0cm, -0.8cm)}] (p2) {Swap(a, c)};
+        \node [proc, right = 2.0 of t3, shift={(0.0cm, -0.8cm)}] (p3) {Swap(a, b)};
+
+        % 布置用于连接的坐标结点，同时为其布置调试标记点。
+        \node [coord] (c1) at ($(t1)!0.6!(t2)$)  {};% \cmark{1}
+        \node [coord] (c2) at ($(t2)!0.6!(t3)$)  {};% \cmark{2}
+        \node [coord] (c3) at ($(t3)!0.65!(end2)$)  {};% \cmark{3}
+
+        % 绘制判断框与其它结点单元的连线，每次绘制时，先绘制一个带有一个固定
+        % 位置标注的路径(path)，然后再绘制箭头本身(arrow)。
+        \path (t1.south) -- node [near start, right] {$N$} (t2.north);
+        \draw [norm] (t1.south) -- (t2.north);
+        \path (t1.east) -| node [near start, above] {$Y$} (p1.north);
+        \draw [norm] (t1.east) -| (p1.north);
+
+        \path (t2.south) -- node [near start, right] {$N$} (t3.north);
+        \draw [norm] (t2.south) -- (t3.north);
+        \path (t2.east) -| node [near start, above] {$Y$} (p2.north);
+        \draw [norm] (t2.east) -| (p2.north);
+
+        \path (t3.south) -- node [near start, right] {$N$} (end2.north);
+        \draw [norm] (t3.south) -- (end2.north);
+        \path (t3.east) -| node [near start, above] {$Y$} (p3.north);
+        \draw [norm] (t3.east) -| (p3.north);
+
+        % 绘制其它连线
+        \draw [norm] (p1.south) |- (c1);
+        \draw [norm] (p2.south) |- (c2);
+        \draw [norm] (p3.south) |- (c3);
+      \end{scope}
+      \begin{scope}[scale = 0.8, every node/.append style = {transform
+          shape}]%transform canvas = {scale=0.8}, overlay
+        % 布置结点单元
+        \node [term,  right =8.0 of st1, shift={(0.0cm, 0.0cm)}] (st3) {Begin};
+        \node [proc, join] (p4) {int temp};
+        \node [proc, join] (p5) {temp = *pa};
+        \node [proc, join] (p6) {*pa = *pb};
+        \node [proc, join] (p7) {*pb = temp};        
+        \node [term, join] (end3) {End};
+      \end{scope}
+      % 绘制Sort函数调用关系
+      \draw [free] (p0.east) to [out = 45, in = -135] (st2.west);
+      \draw [free] (p0.east) to [out = -45, in = 135] (end2.west);
+      % 绘制Swap函数调用关系
+      \draw [free] (p1.east) to [out = 45, in = -135] (st3.west);
+      \draw [free] (p1.east) to [out = -45, in = 135] (end3.west);
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{if-else结构}{if结构} %must using [fragile]
+  \begin{itemize}
+  \item 对三个整型数\alert{从大到小}排序
+  \end{itemize}
+  \begin{center}
+    \begin{minipage}[h]{0.4\linewidth}
+      \begin{exampleblock}{主函数}
+        \cfile[fontsize=\tiny]{codes/chap07/ex07-01sort3ints/funcmain.c}
+      \end{exampleblock}
+    \end{minipage}\qquad
+    \begin{minipage}[h]{0.45\linewidth}
+      \begin{exampleblock}{子函数}
+        \cfile[fontsize=\tiny]{codes/chap07/ex07-01sort3ints/funcdef.c}
+      \end{exampleblock}
+    \end{minipage}
+  \end{center}
+\end{frame}

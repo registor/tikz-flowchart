@@ -1,0 +1,110 @@
+% 使用ctexart文档类（用XeLaTeX编译，直接支持中文）
+\documentclass{ctexart}
+
+%导言区，可以在此引入必要的宏包
+\usepackage[debug]{tikz-flowchart}
+
+% \flowchartset{
+%   free color = gray,
+%   norm color = blue,
+%   cong color = red,
+% }
+
+\begin{document} %在document环境中撰写文档
+
+\begin{tikzpicture}
+  % -------------------------------------------------
+  % 布置结点单元
+  \node [proc, densely dotted, it] (p0) {新触发器消息线程};
+  % 使用"join"参数以将新结点自动连接到前一个结点
+  \node [term, join]      {触发器调度表};
+  \node [proc, join] (p1) {获取配额 $k > 1$};
+  \node [proc, join]      {打开队列};
+  \node [proc, join]      {派发消息};
+  \node [test, join] (t1) {获得消息?};
+  % test结点的出口连接相对复杂，不再使用"join"参数
+  % 继续布置完成所有结点
+  \node [proc] (p2) {$k \mathbin{{-}{=}} 1$};
+  \node [proc, join] (p3) {派发消息};
+  \node [test, join] (t2) {获得消息?};
+  \node [test] (t3) {容量满?};
+  \node [test] (t4) {$k \mathbin{{-}{=}} 1$};
+  % 将下一个结点布置到第2栏，直接布置于p1结点的右边
+  % 由于栏间距已进行设置，在此无需再次设定
+  \node [proc, fill=\freecolor!25, right=of p1] (p4) {重置拥塞};
+  \node [proc, join=by free] {设置等待标志\textsc{mq}};
+  \node [proc, join=by free] (p5) {派发消息};
+  \node [test, join=by free] (t5) {获得消息?};
+  \node [test] (t6) {容量满?};
+  % 布置更多结点(应该避免这样布置结点，不是很好看)
+  \node [test] (t7) [right=of t2] {$k \mathbin{{-}{=}} 1$};
+  \node [proc, fill=\congcolor!25, right=of t3] (p8) {设置拥塞};
+  \node [proc, join=by cong, right=of t4] (p9) {关闭队列};
+  \node [term, join] (p10) {退出触发器消息线程};
+  % -------------------------------------------------
+  % 布置坐标点，以实现拐角连接或添加注释说明
+  % 同时，用\cmark命令对各个点进行了标记，以方便调试
+  \node [coord, right=of t1] (c1)  {}; \cmark{1}   
+  \node [coord, right=of t3] (c3)  {}; \cmark{3}   
+  \node [coord, right=of t6] (c6)  {}; \cmark{6}   
+  \node [coord, right=of t7] (c7)  {}; \cmark{7}   
+  \node [coord, left=of t4]  (c4)  {}; \cmark{4}   
+  \node [coord, right=of t4] (c4r) {}; \cmark[r]{4}
+  \node [coord, left=of t7]  (c5)  {}; \cmark{5}   
+  % -------------------------------------------------
+  % 布置注释结点
+  \node [above=0mm of p4, it] {(队列为空)};
+  \node [above=0mm of p8, it] {(队列非空)};
+  % -------------------------------------------------
+  % 首先绘制判断框与其它结点单元南北方向的连接线
+  % 每次绘制时，先绘制一个带有一个固定位置标注的路径(path)
+  % 然后再绘制箭头本身(arrow)。
+  \path (t1.south) to node [near start, xshift=1em] {$y$} (p2);
+  \draw [norm] (t1.south) -- (p2);
+  \path (t2.south) to node [near start, xshift=1em] {$y$} (t3); 
+  \draw [norm] (t2.south) -- (t3);
+  \path (t3.south) to node [near start, xshift=1em] {$y$} (t4); 
+  \draw [norm] (t3.south) -- (t4);
+  \path (t5.south) to node [near start, xshift=1em] {$y$} (t6); 
+  \draw [free] (t5.south) -- (t6);
+  \path (t6.south) to node [near start, xshift=1em] {$y$} (t7); 
+  \draw [free] (t6.south) -- (t7); 
+  % ------------------------------------------------- 
+  % 其次绘制判断框与其它结点单元东西方向的连接线
+  % 为固定标位置，在垂直方向上进行坐标设定，然后再绘制箭头本身(arrow)。
+  \path (t3.east) to node [near start, yshift=1em] {$n$} (c3); 
+  \draw [cong] (t3.east) -- (p8);
+  \path (t4.east) to node [yshift=-1em] {$k \leq 0$} (c4r); 
+  \draw [norm] (t4.east) -- (p9);
+  % -------------------------------------------------
+  % 最后绘制其它方向的连接线
+  % 同样先绘制一个带有一个固定位置标注的路径(path)，然后再绘制箭头本身(arrow)。
+  \path (t1.east) to node [near start, yshift=1em] {$n$} (c1); 
+  \draw [free] (t1.east) -- (c1) |- (p4);
+  \path (t2.east) -| node [very near start, yshift=1em] {$n$} (c1); 
+  \draw [free] (t2.east) -| (c1);
+  \path (t4.west) to node [yshift=-1em] {$k>0$} (c4); 
+  \draw [norm] (t4.west) -- (c4) |- (p3);
+  \path (t5.east) -| node [very near start, yshift=1em] {$n$} (c6); 
+  \draw [free] (t5.east) -| (c6); 
+  \path (t6.east) to node [near start, yshift=1em] {$n$} (c6); 
+  \draw [free] (t6.east) -| (c7); 
+  \path (t7.east) to node [yshift=-1em] {$k \leq 0$} (c7); 
+  \draw [free] (t7.east) -- (c7)  |- (p9);
+  \path (t7.west) to node [yshift=-1em] {$k>0$} (c5); 
+  \draw [free] (t7.west) -- (c5) |- (p5);
+  % -------------------------------------------------
+  % 最后一个标不符合以上所有规则
+  \draw [->, dotted, thick, shorten >=1mm]
+  (p9.south) -- ++(5mm,-3mm)  -- ++(27mm,0) 
+  |- node [black, near end, yshift=0.75em, it]
+  {(当消息和资源都有效时)} (p0);
+  % -------------------------------------------------     
+\end{tikzpicture}
+  
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
