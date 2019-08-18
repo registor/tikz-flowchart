@@ -5,8 +5,8 @@
 
 Happy LaTeXing！~
 
-![scale=0.5](./screenshot/flowchart01.png)
-![scale=0.5](./screenshot/flowchart02.png)
+![200x](./screenshot/flowchart01.png)
+![200x](./screenshot/flowchart02.png)
 
 ## 使用方法
 1. `\flowchartset`命令
