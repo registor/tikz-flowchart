@@ -1,14 +1,15 @@
 # tikz-flowchat
 
-## 介绍
-这是一个使用TiKZ绘制传统程序流程图的简单宏包，通过定义`proc`、`test`、`term`等`node`样式实现。该宏包核心代码摘录自[Brent Longborough](http://www.texample.net/tikz/examples/author/brent-longborough/)设计的流程图绘制样例，参考了tikz-imagelabels宏包的设计思路，提供了`\flowchartset`命令以设置绘制参数。
+## 简介
+这是一个使用TiKZ绘制传统程序流程图的简单宏包，通过定义`proc`、`test`、`io`、`term`等`node`样式实现。该宏包核心代码摘录自[Brent Longborough](http://www.texample.net/tikz/examples/author/brent-longborough/)设计的流程图绘制样例，参考了tikz-imagelabels宏包的设计思路，提供了`\flowchartset`命令以设置绘制参数。
 
 Happy LaTeXing！~
 
-![](./screenshot/flowchart01.png)
-![](./screenshot/flowchart02.png)
+![scale=0.5](./screenshot/flowchart01.png)
+![scale=0.5](./screenshot/flowchart02.png)
 
-## `\flowchartset`命令
+## 使用方法
+1. `\flowchartset`命令
 `\flowchartset`命令用于设置绘制参数，详细说明如下：
 
 ```
@@ -35,6 +36,19 @@ Happy LaTeXing！~
 }
 
 ```
+该命令允许仅指定需要的参数，可以放在导言区进行全局设置，也可以根据需要放在需要的地方进行局部设置。
+
+2. 在`tikzpicture`环境中使用类似`\node [proc, join] (p1) {$k -= 1$};`的命令采用`proc`、`test`、`io`或`term`node样式参数布置需要的流程框结点。布置结点时，如果前一个结点不是`test`样式，则可以在`\node`命令中采用`join`参数自动与前一个结点建立连接并绘制流程线。可以根据需要对布置的结点进行命名，以便后续结点或连接点进行引用。*注意*：可以在`\node`命令中使用其它所有合法的参数。
+
+3. 在`tikzpicture`环境中使用类似`\node [coord, right=0.8 of t1] (c1)  {}; \cmark{1}`命令采用`coord`node样式布置其它需要的坐标点(用于流程线的转接)。同时，可以用`\cmark`命令为该点作出标记，以方便流程线连线调试。该标记在使用`debug`可选参数引入`\usepackage[debug]{tikz-flowchart}`宏包时，将进行绘制，若引入宏包时无`debug`可选参数，则不绘制该标记点。*注意*：可以在`\node`命令中使用其它所有合法的参数。
+
+4. 在`tikzpicture`环境中使用类似`\path (t1.south) to node [near start, xshift=1em] {$y$} (p2);`命令进行流程线条件标注，再使用类似`\draw [norm] (t1.south) -- (p2);`命令，用`norm`、`free`或 `cong`node样式绘制指定颜色的带有箭头的流程线。建议先绘制南北方向流程线，再绘制东西方向流程线。*注意*：可以在`\path`、`\draw`命令中使用其它所有合法的参数。
+
+5. 在`tikzpicture`环境中使用其它各类合法TiKZ命令绘制需要的图形。
+
+6. 该宏包还定义了`lnorm`、`lfree`和`lcong`node样式，分别用于绘制指定颜色的无箭头的流程线；`dotnorm`、`dotfree`和`dotcong`node样式，分别用于绘制指定颜色的实心交点；`cdotnorm`、`cdotfree`和`cdotcong`node样式，分别用于绘制指定颜色的空心交点；`connector`node样式，用于绘制流程线链接标记；`connect`draw样式，用于绘制非相交交汇流程线。
+
+7. 绘制样例请参阅main.tex文件中的样例代码及注释说明。
 
 ## 注意
 
