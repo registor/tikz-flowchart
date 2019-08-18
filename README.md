@@ -5,8 +5,8 @@
 
 Happy LaTeXing！~
 
-![200x](./screenshot/flowchart01.png)
-![200x](./screenshot/flowchart02.png)
+![](./screenshot/flowchart01.png)
+![](./screenshot/flowchart02.png)
 
 ## 使用方法
 1. `\flowchartset`命令
@@ -42,11 +42,11 @@ Happy LaTeXing！~
 
 3. 在`tikzpicture`环境中使用类似`\node [coord, right=0.8 of t1] (c1)  {}; \cmark{1}`命令采用`coord`node样式布置其它需要的坐标点(用于流程线的转接)。同时，可以用`\cmark`命令为该点作出标记，以方便流程线连线调试。该标记在使用`debug`可选参数引入`\usepackage[debug]{tikz-flowchart}`宏包时，将进行绘制，若引入宏包时无`debug`可选参数，则不绘制该标记点。*注意*：可以在`\node`命令中使用其它所有合法的参数。
 
-4. 在`tikzpicture`环境中使用类似`\path (t1.south) to node [near start, xshift=1em] {$y$} (p2);`命令进行流程线条件标注，再使用类似`\draw [norm] (t1.south) -- (p2);`命令，用`norm`、`free`或 `cong`node样式绘制指定颜色的带有箭头的流程线。建议先绘制南北方向流程线，再绘制东西方向流程线。*注意*：可以在`\path`、`\draw`命令中使用其它所有合法的参数。
+4. 在`tikzpicture`环境中使用类似`\path (t1.south) to node [near start, xshift=1em] {$y$} (p2);`命令进行流程线条件标注，再使用类似`\draw [norm] (t1.south) -- (p2);`命令，用`norm`、`free`或 `cong`draw样式绘制指定颜色的带有箭头的流程线。建议先绘制南北方向流程线，再绘制东西方向流程线。*注意*：可以在`\path`、`\draw`命令中使用其它所有合法的参数。
 
 5. 在`tikzpicture`环境中使用其它各类合法TiKZ命令绘制需要的图形。
 
-6. 该宏包还定义了`lnorm`、`lfree`和`lcong`node样式，分别用于绘制指定颜色的无箭头的流程线；`dotnorm`、`dotfree`和`dotcong`node样式，分别用于绘制指定颜色的实心交点；`cdotnorm`、`cdotfree`和`cdotcong`node样式，分别用于绘制指定颜色的空心交点；`connector`node样式，用于绘制流程线链接标记；`connect`draw样式，用于绘制非相交交汇流程线。
+6. 该宏包还定义了`lnorm`、`lfree`和`lcong`draw样式，分别用于绘制指定颜色的无箭头的流程线；`dotnorm`、`dotfree`和`dotcong`draw样式，分别用于绘制指定颜色的实心交点；`cdotnorm`、`cdotfree`和`cdotcong`draw样式，分别用于绘制指定颜色的空心交点；`connector`draw样式，用于绘制流程线链接标记；`connect`draw样式，用于绘制非相交交汇流程线。
 
 7. 绘制样例请参阅main.tex文件中的样例代码及注释说明。
 
