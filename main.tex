@@ -2,16 +2,29 @@
 \documentclass{ctexart}
 
 %导言区，可以在此引入必要的宏包
-\usepackage[debug]{tikz-flowchart}
+\usepackage{tikz-flowchart}
 
-% \flowchartset{
-%   free color = gray,
-%   norm color = blue,
-%   cong color = red,
-% }
+% 各参数默认值
+\flowchartset{
+  free color = green, % 自由连线颜色(默认取green)
+  norm color = blue, % 常规连线颜色(默认取blue)
+  cong color = red, % 关联连线颜色(默认取red)
+  proc fill color = white, % 顺序处理框填充颜色(默认取白色)
+  test fill color = white, % 判断框填充颜色(默认取白色)
+  io fill color = white, % 输入/输出框填充颜色(默认取白色)
+  term fill color = white, % 开始/结束框填充颜色(默认取白色)
+  chain direction = below, % 结点自动布置方向(默认取below)
+  minimum node distance = 6mm, % 最小结点间距(默认取6mm)
+  maximum node distance = 60mm, % 最大结点间距(默认取60mm)
+  border line width = \pgflinewidth, % 各类流程框边框宽度(默认取当前线条宽度)
+  flow line width = \pgflinewidth, % 各类流程线线条宽度(默认取当前线条宽度)
+  stealth length = 1.5mm, % 箭头长度(默认取1.5mm)
+  stealth width = 1.0mm, % 箭头宽度(默认取1.0mm)
+}
+
 
 \begin{document} %在document环境中撰写文档
-
+% 可以绘制复杂流程图
 \begin{tikzpicture}
   % -------------------------------------------------
   % 布置结点单元
@@ -44,13 +57,13 @@
   % -------------------------------------------------
   % 布置坐标点，以实现拐角连接或添加注释说明
   % 同时，用\cmark命令对各个点进行了标记，以方便调试
-  \node [coord, right=of t1] (c1)  {}; \cmark{1}   
-  \node [coord, right=of t3] (c3)  {}; \cmark{3}   
-  \node [coord, right=of t6] (c6)  {}; \cmark{6}   
-  \node [coord, right=of t7] (c7)  {}; \cmark{7}   
-  \node [coord, left=of t4]  (c4)  {}; \cmark{4}   
-  \node [coord, right=of t4] (c4r) {}; \cmark[r]{4}
-  \node [coord, left=of t7]  (c5)  {}; \cmark{5}   
+  \node [coord, right=0.8 of t1] (c1)  {}; \cmark{1}   
+  \node [coord, right=0.8 of t3] (c3)  {}; \cmark{3}   
+  \node [coord, right=0.8 of t6] (c6)  {}; \cmark{6}   
+  \node [coord, right=0.8 of t7] (c7)  {}; \cmark{7}   
+  \node [coord, left=0.8 of t4]  (c4)  {}; \cmark{4}   
+  \node [coord, right=0.8 of t4] (c4r) {}; \cmark[r]{4}
+  \node [coord, left=0.8 of t7]  (c5)  {}; \cmark{5}   
   % -------------------------------------------------
   % 布置注释结点
   \node [above=0mm of p4, it] {(队列为空)};
@@ -101,7 +114,124 @@
   {(当消息和资源都有效时)} (p0);
   % -------------------------------------------------     
 \end{tikzpicture}
-  
+
+% 可以在结点中使用\verb等命令
+\begin{tikzpicture}
+  % 布置结点单元  
+  \node [term] (st) {开始};
+  \node [proc, join] (p1) {\verb!int r = 0!};
+  \node [test, join] (t1) {\verb!m < n!};        
+  \node [proc] (p2) {\verb! m ^= n !\\ \verb!n ^= m !\\ \verb!m ^= n!};        
+  \node [test, join] (t2) {\verb|n != 0|};
+  \node [proc] (p3) {\verb!r = m % n! \\ \verb!m = n!\\ \verb!n = r!};        
+  \node [proc] (p4) {\verb!return m!};
+  \node [term, join] (end) {结束};
+
+  % 布置用于连接的坐标结点，同时为其布置调试标记点。
+  \node [coord] (c1) at ($(p2.south)!0.5!(t2.north)$)  {}; \cmark{1}
+  \node [coord, below = 0.25 of p3] (c2) {};  \cmark{2}
+  \node [coord, above = 0.25 of p4] (c3) {};  \cmark{3}
+  \node [coord, right = 1.0 of t1] (c4) {};  \cmark{4}
+  \node [coord, right = 1.0 of t2] (c5) {};  \cmark{5}
+  \node [coord, left = 1.0 of t2] (ct) {};  \cmark{t}        
+  \node [coord] (c6) at (ct |- c2)  {}; \cmark{6}
+       
+  % 判断框连线，每次绘制时，先绘制一个带有一个固定
+  % 位置标注的路径(path)，然后再绘制箭头本身(arrow)。
+  \path (t1.south) -- node [near start, right] {$Y$} (p2.north);
+  \draw [norm] (t1.south) -- (p2.north);
+  \path (t1.east) -- node [near start, above] {$N$} (c4);
+  \draw [norm] (t1.east) -- (c4) |- (c1);
+  \path (t2.south) -- node [near start, right] {$Y$} (p3.north);
+  \draw [norm] (t2.south) -- (p3.north);
+  \path (t2.east) -- node [near start, above] {$N$} (c5);
+  \draw [norm] (t2.east) -- (c5) |- (c3) -- (p4.north);
+
+  % 其它连线
+  \draw [norm](p3.south) |- (c6) |- (c1);
+\end{tikzpicture}
+
+% 可以更改字号、各类流程框的宽度等
+\begin{tikzpicture}[font=\small]
+  % 布置结点单元
+  \node [term] (st) {开始};
+  \node [proc, join] (p1) {\verb|sum = x|\\\verb|x_pow = x|\\\verb|item = 0.0|};
+  \node [proc, join] (p2) {\verb|n = 1|\\\verb|fact = 1|\\\verb|sign = 1|};        
+  \node [proc, join, text width = 16em] (p3) {\verb|fact = fact * (n + 1) * (n + 2)|\\\verb|x_pow *= x * x|\\\verb|sign = -sign|\\\verb|item =  sign * x_pow / fact|\\\verb|sum += item|\\\verb|n += 2|};
+        
+  \node [test, join, text width = 10em] (t1) {\verb|fabs(item) > epsilon|};
+  \node [proc] (p4) {\verb|return sum|};
+  \node [term, join] (end) {结束};
+
+  % 布置用于连接的坐标结点，同时为其布置调试标记点。
+  \node [coord] (c1) at ($(p2.south)!0.5!(p3.north)$)  {}; \cmark{1}
+  \node [coord, right = 2.0 of t1] (ct) {};  \cmark{t}        
+  \node [coord] (c2) at (ct |- c1)  {}; \cmark{2}
+
+  % 判断框连线，每次绘制时，先绘制一个带有一个固定
+  % 位置标注的路径(path)，然后再绘制箭头本身(arrow)。
+  \path (t1.south) -- node [near start, right] {$N$} (p4.north);
+  \draw [norm] (t1.south) -- (p4.north);
+  \path (t1.east) -- node [near start, above] {$Y$} (ct);
+  \draw [norm] (t1.east) -| (c2) -- (c1);  
+\end{tikzpicture}
+
+% 可以局部更改各参数
+\flowchartset{
+  proc fill color = orange!10, % 顺序处理框填充颜色(默认取白色)
+  test fill color = green!30, % 判断框填充颜色(默认取白色)
+  io fill color = blue!30, % 输入/输出框填充颜色(默认取白色)
+  term fill color = red!30, % 开始/结束框填充颜色(默认取白色)
+}
+
+\begin{tikzpicture}
+  % 布置结点单元
+  \node [term] (st) {开始};
+  \node [proc, text width = 6em, join] (p1) {\verb|int divisor|};       
+  \node [test, join] (t1) {\verb|n <= 1|};
+  \node [proc, text width = 6em] (p2) {\verb|divisor = 2|};
+  \node [test, text width = 10em, join] (t2) {\verb|divisor * divisor <= n|};
+  \node [test, text width = 8em] (t3) {\verb|n % divisor == 0|};
+  \node [proc, text width = 6em] (p3) {\verb|divisor++|};
+  \node [term, below = 1.6 of p3] (end) {结束};
+  \node [proc, text width = 6em, left = 4.8 of t2] (p4) {\verb|return 0|};
+  \node [proc, text width = 6em, right = 3.5 of p3] (p5) {\verb|return 0|};
+  \node [proc, text width = 6em, right = 5.8 of t3] (p6) {\verb|return 1|};
+
+  % 布置用于连接的坐标结点，同时为其布置调试标记点。
+  \node [coord] (c1) at ($(p2.south)!0.5!(t2.north)$)  {}; \cmark{1}
+  \node [coord, below = 0.25 of p3] (c2)  {}; \cmark{2}
+  \node [coord, above = 0.5 of end] (c3) {};  \cmark{3}
+  \node [coord, left = 0.5 of t2] (ct) {};  \cmark{t}
+  \node [coord] (c4) at (c3 -| p5)  {}; \cmark{4}
+  \node [coord] (c5) at (c2 -| ct)  {}; \cmark{5}
+        
+  % 判断框连线，每次绘制时，先绘制一个带有一个固定
+  % 位置标注的路径(path)，然后再绘制箭头本身(arrow)。
+  \path (t1.south) -- node [near start, right] {$N$} (p2.north);
+  \draw [norm] (t1.south) -- (p2.north);
+  \path (t1.west) -| node [near start, above] {$Y$} (p4.north);
+  \draw [norm] (t1.west) -| (p4.north);
+        
+  \path (t2.south) -- node [near start, right] {$Y$} (t3.north);
+  \draw [norm] (t2.south) -- (t3.north);
+  \path (t2.east) -| node [near start, above] {$N$} (p6.north);
+  \draw [norm] (t2.east) -| (p6.north);
+        
+  \path (t3.south) -- node [near start, right] {$N$} (p3.north);
+  \draw [norm] (t3.south) -- (p3.north);
+  \path (t3.east) -| node [near start, above] {$Y$} (p5.north);
+  \draw [norm] (t3.east) -| (p5.north);
+
+  % 其它连线
+  \draw [norm](p3.south) |- (c5) |- (c1);
+  \draw [norm](p4.south) |- (c3);
+  \draw [norm](p4.south) |- (c3) -- (end);
+  \draw [norm](p5.south) -- (c4);
+  \draw [norm](p6.south) |- (c3);
+  \draw [norm](p6.south) |- (c3) -- (end);
+\end{tikzpicture}
+
 \end{document}
 
 %%% Local Variables:

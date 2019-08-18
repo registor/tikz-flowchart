@@ -5,7 +5,32 @@
 
 Happy LaTeXing！~
 
-![](./screenshot/flowchart.png)
+![](./screenshot/flowchart01.png)
+![](./screenshot/flowchart02.png)
+
+## `\flowchartset`命令
+`\flowchartset`命令用于设置绘制参数，详细说明如下：
+
+```
+% 各绘图参数及其默认值
+\flowchartset{
+  free color = green,                % 自由连线颜色(默认取green)
+  norm color = blue,                 % 常规连线颜色(默认取blue)
+  cong color = red,                  % 关联连线颜色(默认取red)
+  proc fill color = white,           % 顺序处理框填充颜色(默认取白色)
+  test fill color = white,           % 判断框填充颜色(默认取白色)
+  io fill color = white,             % 输入/输出框填充颜色(默认取白色)
+  term fill color = white,           % 开始/结束框填充颜色(默认取白色)
+  chain direction = below,           % 结点自动布置方向(默认取below)
+  minimum node distance = 6mm,       % 最小结点间距(默认取6mm)
+  maximum node distance = 60mm,      % 最大结点间距(默认取60mm)
+  border line width = \pgflinewidth, % 各类流程框边框宽度(默认取当前线条宽度)
+  flow line width = \pgflinewidth,   % 各类流程线线条宽度(默认取当前线条宽度)
+  stealth length = 1.5mm,            % 箭头长度(默认取1.5mm)
+  stealth width = 1.0mm,             % 箭头宽度(默认取1.0mm)
+}
+
+```
 
 ## 注意
 

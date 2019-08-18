@@ -41,7 +41,7 @@
   arrows.meta,
   shapes.geometric,
   chains,
-  %calc,
+  calc,
 }
 
 % 设置参数设置命令
@@ -49,43 +49,100 @@
   /flowchart/.is family,
   /flowchart/.search also={/tikz},
 }
-
 \def\flowchartset{\pgfqkeys{/flowchart}}
+% 定义参数及代表该参数的宏名称
 \flowchartset{
-  free color/.store in = \freecolor,
-  norm color/.store in = \normcolor,
-  cong color/.store in = \congcolor,
-  border line width/.store in = \bdlinewd,
-  flow line width/.store in = \fllinewd,
+  free color/.store in = \freecolor, % 自由连线颜色
+  norm color/.store in = \normcolor, % 常规连线颜色
+  cong color/.store in = \congcolor, % 关联连线颜色
+  proc fill color/.store in = \procfillcolor, % 顺序处理框填充颜色
+  test fill color/.store in = \testfillcolor, % 判断框填充颜色
+  io fill color/.store in = \iofillcolor, % 输入/输出框填充颜色
+  term fill color/.store in = \termfillcolor, % 开始/结束框填充颜色
+  chain direction/.store in = \chaindir, % 结点自动布置方向
+  minimum node distance/.store in = \minnodedis, % 最小结点间距
+  maximum node distance/.store in = \maxnodedis, % 最大结点间距
+  border line width/.store in = \bdlinewd, % 各类流程框边框宽度
+  flow line width/.store in = \flowlinewd, % 各类流程线线条宽度
+  stealth length/.store in = \stealthlen, % 箭头长度
+  stealth width/.store in = \stealthwd, % 箭头宽度
+}
+% 各参数默认值
+\flowchartset{
+  free color = green, % 自由连线颜色(默认取green)
+  norm color = blue, % 常规连线颜色(默认取blue)
+  cong color = red, % 关联连线颜色(默认取red)
+  proc fill color = white, % 顺序处理框填充颜色(默认取白色)
+  test fill color = white, % 判断框填充颜色(默认取白色)
+  io fill color = white, % 输入/输出框填充颜色(默认取白色)
+  term fill color = white, % 开始/结束框填充颜色(默认取白色)
+  chain direction = below, % 结点自动布置方向(默认取below)
+  minimum node distance = 6mm, % 最小结点间距(默认取6mm)
+  maximum node distance = 60mm, % 最大结点间距(默认取60mm)
+  border line width = \pgflinewidth, % 各类流程框边框宽度(默认取当前线条宽度)
+  flow line width = \pgflinewidth, % 各类流程线线条宽度(默认取当前线条宽度)
+  stealth length = 1.5mm, % 箭头长度(默认取1.5mm)
+  stealth width = 1.0mm, % 箭头宽度(默认取1.0mm)
 }
 
-% 参数默认值
-\flowchartset{
-  free color = green,
-  norm color = blue,
-  cong color = red,
-  border line width = {},
-  flow line width = {},
-}
-
-% 定义流程图各符号样式
+% 定义流程图绘图样式
 \tikzset{
-  start chain = going below,    % 自顶向下绘制
-  node distance = 6mm and 60mm, % 结点距离的全局设置
-  every join/.style = {norm},   % 默认的结点连线样式
-  base/.style = {\bdlinewd, draw, on chain, on grid, align=center, minimum height=4ex},%基本样式
-  proc/.style={base, rectangle, text width=8em},%处理框样式
-  test/.style={base, diamond, aspect=2, text width=5em},%判断框样式
-  io/.style={base, trapezium, trapezium left angle=70, trapezium right
-    angle=110, text width=6em},%输入/输出框样式
-  term/.style={proc, rounded corners},%开始结束框样式
+  start chain = going \chaindir,    % 结点自动布置方向(默认取below)
+  node distance = \minnodedis and \maxnodedis, % 结点间距
+  every join/.style = {norm},   % 默认自动连接线的连线样式
+  % 流程框样式的基础样式
+  base/.style = {line width = \bdlinewd, % 边框线宽
+                 draw,                   % 绘制边框
+                 on chain,               % 沿布局方向绘制
+                 on grid,                % 沿网格布局
+                 align=center,           % 内容居中对齐
+                 minimum height=2ex,      % 流程框最小高度
+                },
+  % 顺序处理框样式
+  proc/.style={base,           % 基础样式  
+               rectangle,      % 矩形边框
+               text width=8em, % 最大文本宽度(超过会自动换行)
+               fill=\procfillcolor, % 填充色
+              },
+  % 判断框样式
+  test/.style={base,           % 基础样式
+               diamond,        % 菱形边框
+               aspect=2.5,       % 长高比例
+               text width=5em, % 最大文本宽度(超过会自动换行)
+               fill=\testfillcolor, % 填充色
+              },
+  % 输入/输出框样式
+  io/.style={base,                      % 基础样式
+             trapezium,                 % 平行四边形
+             trapezium left angle=70,   % 平行四边形左倾角
+             trapezium right angle=110, % 平行四边形右倾角
+             text width=6em,            % 最大文本宽度(超过会自动换行)
+             fill=\iofillcolor, % 填充色
+            },
+  % 开始/结束框样式
+  term/.style={proc,            % 基于proc样式
+               rounded corners=2.0mm, % 为矩形添加圆角属性
+               text width=3em, % 最大文本宽度(超过会自动换行) 
+               fill=\termfillcolor, % 填充色
+              },
   % 流程连接点样式
-  connector/.style = {draw,circle,node distance=3cm},
-  % coord结点样式用于绘制连接线的角点
-  coord/.style={coordinate, on chain, on grid, node distance=6mm and 25mm},
-  % nmark结点样式用于绘制调试中的坐标标记
-  nmark/.style={draw, cyan, circle, font={\tiny\sffamily\bfseries}},
-  % 不相交的两个交汇路径的连接样式
+  connector/.style = {draw,              % 绘制边框
+                      circle,            % 圆形
+                      node distance=3cm, % 节点间距
+                     },
+  % coord结点样式(用于布置流程线连接点)
+  coord/.style={coordinate,                 % 笛卡尔坐标系
+                %on chain,                   % 沿布局方向绘制
+                %on grid,                    % 沿网格布局
+                node distance=6mm and 25mm, % 节点间距
+               },
+  % nmark结点样式(用于布置调试坐标标记点)
+  nmark/.style={draw,                           % 绘制边框
+                cyan,                           % 青色
+                circle,                         % 圆形
+                font={\sffamily\bfseries}, % 字体
+               },
+  % 绕接连线样式(不相交的两个交汇路径)
   connect/.style args={(#1) to (#2) over (#3) by #4}{
     insert path={
       let \p1=($(#1)-(#3)$), \n1={veclen(\x1,\y1)}, 
@@ -94,22 +151,68 @@
     }
   }, 
   % -------------------------------------------------
-  % 流程图中无箭头连线样式
-  lnorm/.style={\fllinewd, draw, \normcolor},
-  lfree/.style={\fllinewd, draw, \freecolor},
-  lcong/.style={\fllinewd, draw, \congcolor},
-  % 流程图中流程线汇聚实心样式
-  dotnorm/.style={draw, fill = \normcolor, \normcolor},
-  dotfree/.style={draw, fill = \freecolor, \freecolor},
-  dotcong/.style={draw, fill = \congcolor, \congcolor},
-  % 流程图中流程线汇聚空心样式
-  cdotnorm/.style={draw, \normcolor},
-  cdotfree/.style={draw, \freecolor},
-  cdotcong/.style={draw, \congcolor},
-  % 流程图中有箭头连线样式
-  norm/.style={\fllinewd, ->, >=stealth, draw, \normcolor},
-  free/.style={\fllinewd, ->, >=stealth, draw, \freecolor},
-  cong/.style={\fllinewd, ->, >=stealth, draw, \congcolor},
+  % 无箭头连线样式
+  lnorm/.style={line width = \flowlinewd,  % 线宽
+                draw,                      % 绘制
+                \normcolor,                % 颜色
+               },
+  lfree/.style={line width = \flowlinewd, 
+                draw, 
+                \freecolor,
+               },
+  lcong/.style={line width = \flowlinewd, 
+                draw, 
+                \congcolor,
+               },
+  % 流程线实心交点样式
+  dotnorm/.style={draw,              % 绘制
+                  fill = \normcolor, % 填充颜色
+                  \normcolor,        % 颜色
+                 },
+  dotfree/.style={draw, 
+                  fill = \freecolor, 
+                  \freecolor,
+                 },
+  dotcong/.style={draw, 
+                  fill = \congcolor, 
+                  \congcolor,
+                 },
+  % 流程线空心交点样式
+  cdotnorm/.style={draw,       % 绘制 
+                   \normcolor, % 颜色
+                  },
+  cdotfree/.style={draw, 
+                   \freecolor,
+                  },
+  cdotcong/.style={draw, 
+                   \congcolor,
+                  },
+  % 带箭头连线样式
+  norm/.style={line width = \flowlinewd,     % 线宽
+               -{Stealth[length=\stealthlen, % 箭头长度
+                         width=\stealthwd,   % 箭头宽度
+                        ]
+                }, 
+               draw,                        % 绘制 
+               \normcolor,                  % 颜色
+              },
+  free/.style={line width = \flowlinewd, 
+               -{Stealth[length=\stealthlen, 
+                         width=\stealthwd,
+                        ]
+                },
+               draw, 
+               \freecolor,
+              },
+  cong/.style={line width = \flowlinewd, 
+               -{Stealth[length=\stealthlen, 
+                         width=\stealthwd,
+                        ]
+                }, 
+               draw, 
+               \congcolor,
+              },
+  % 斜体字样式
   it/.style={font={\small\itshape}},
 }
 
