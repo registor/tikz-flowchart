@@ -13,6 +13,10 @@
   test fill color = white, % 判断框填充颜色(默认取白色)
   io fill color = white, % 输入/输出框填充颜色(默认取白色)
   term fill color = white, % 开始/结束框填充颜色(默认取白色)
+  proc text width = 8em, % 顺序处理框宽度(默认取8em)
+  test text width = 5em, % 判断框宽度(默认取5em)
+  io text width = 6em, % 输入/输出框宽度(默认取6em)
+  term text width = 3em, % 开始/结束宽度(默认取3em)
   chain direction = below, % 结点自动布置方向(默认取below)
   minimum node distance = 6mm, % 最小结点间距(默认取6mm)
   maximum node distance = 60mm, % 最大结点间距(默认取60mm)
@@ -21,7 +25,6 @@
   stealth length = 1.5mm, % 箭头长度(默认取1.5mm)
   stealth width = 1.0mm, % 箭头宽度(默认取1.0mm)
 }
-
 
 \begin{document} %在document环境中撰写文档
 % 可以绘制复杂流程图
@@ -230,6 +233,65 @@
   \draw [norm](p5.south) -- (c4);
   \draw [norm](p6.south) |- (c3);
   \draw [norm](p6.south) |- (c3) -- (end);
+\end{tikzpicture}
+
+% 测试文字宽度及非连接交点
+% 各参数默认值
+\flowchartset{
+  proc text width = 4em, % 顺序处理框宽度(默认取8em)
+  test text width = 3em, % 判断框宽度(默认取5em)
+}
+\begin{tikzpicture}
+  % 布置结点单元
+  \node [proc] (p1){\verb|d = 2|};
+  \node [test, join] (t1) {\verb|a < n|?};
+  \node [test] (t2) {\verb|n % d == 0|};
+  \node [proc] (p2) {\verb|d++|};
+  \node [proc,below = 1.5 of p2] (p3) {\verb|d = 2|};
+  \node [test, join] (t3) {\verb|d < n|?};
+  \node [proc, left = 2.0 of t3, shift={(0cm, -0.8cm)}] (p4) {\verb|z = d|};
+  \node [proc, right = 2.0 of t3, shift={(0cm, -0.8cm)}] (p5) {\verb|z = n|};
+
+  % 布置用于连接的坐标结点，同时为其布置调试标记点。
+  \node [coord, above = 0.5 of p1] (c1)  {};% \cmark{1}
+  \node [coord] (c2) at ($(p1)!0.35!(t1)$)  {};% \cmark{2}
+  \node [coord, below = 0.25 of p2] (c3)  {};% \cmark{3}
+  \node [coord, above = 0.45 of p3] (c4) {};% \cmark{4}
+  \node [coord] (c5) at ($(p3)!0.35!(t3)$)  {};% \cmark{5}
+  \node [coord, below = 0.5 of p4] (c6) {};% \cmark{6}
+  \node [coord] (c7) at (c6 -| p4)  {};% \cmark{7}
+  \node [coord] (c8) at (c6 -| t3)  {};% \cmark{8}
+  \node [coord, right = 1.0 of t1] (c9) {};% \cmark{9}
+  \node [coord] (c10) at (c9 |- t2)  {};% \cmark{10}
+  \node [coord, right = 0.5 of c10] (c11) {};% \cmark{11}        
+  \node [coord, left = 0.8 of t1] (ct) {};% \cmark{t}
+  \node [coord] (c12) at (c3 -| ct)  {};% \cmark{12}
+  \node [coord, below = 0.5 of c8] (c13) {};% \cmark{13}
+
+  % 判断框连线，每次绘制时，先绘制一个带有一个固定
+  % 位置标注的路径(path)，然后再绘制箭头本身(arrow)。
+  \path (t1.south) -- node [near start, right] {$Y$} (t2.north);
+  \draw [norm] (t1.south) -- (t2.north);
+  \path (t1.east) -- node [near start, above] {$N$} (c9);
+  \draw [norm] (t1.east) -- (c9) |- (c4) -- (p3.north);
+
+  \path (t2.south) -- node [near start, right] {$N$} (p2.north);
+  \draw [norm] (t2.south) -- (p2.north);
+  \path (t2.east) -- node [near start, above] {$Y$} (c10);
+  \draw [lnorm] (t2.east) -- ($(c10) + (-2pt, 0)$);
+
+  \path (t3.west) -| node [near start, above] {$Y$} (p4.north);
+  \draw [norm] (t3.west) -| (p4.north);
+  \path (t3.east) -| node [near start, above] {$N$} (p5.north);
+  \draw [norm] (t3.east) -| (p5.north);
+
+  % 其它连线
+  \draw [norm] (c1) -- (p1);
+  \draw [norm] (p2.south) |- (c12) |- (c2);
+  % 绘制不相交的两个交汇路径，注意connect样式的使用
+  \draw [norm, connect=(t2.east) to (c11) over (c10) by 3pt] |- (c5);
+  \draw [norm] (p4.south) |- (c8) -- (c13);
+  \draw [norm] (p5.south) |- (c8) -- (c13);
 \end{tikzpicture}
 
 \end{document}

@@ -59,6 +59,10 @@
   test fill color/.store in = \testfillcolor, % 判断框填充颜色
   io fill color/.store in = \iofillcolor, % 输入/输出框填充颜色
   term fill color/.store in = \termfillcolor, % 开始/结束框填充颜色
+  proc text width/.store in = \proctxtwd, % 顺序处理框宽度
+  test text width/.store in = \testtxtwd, % 判断框宽度
+  io text width/.store in = \iotxtwd, % 输入/输出框宽度
+  term text width/.store in = \termtxtwd, % 开始/结束宽度
   chain direction/.store in = \chaindir, % 结点自动布置方向
   minimum node distance/.store in = \minnodedis, % 最小结点间距
   maximum node distance/.store in = \maxnodedis, % 最大结点间距
@@ -76,6 +80,10 @@
   test fill color = white, % 判断框填充颜色(默认取白色)
   io fill color = white, % 输入/输出框填充颜色(默认取白色)
   term fill color = white, % 开始/结束框填充颜色(默认取白色)
+  proc text width = 8em, % 顺序处理框宽度(默认取8em)
+  test text width = 5em, % 判断框宽度(默认取5em)
+  io text width = 6em, % 输入/输出框宽度(默认取6em)
+  term text width = 3em, % 开始/结束宽度(默认取3em)
   chain direction = below, % 结点自动布置方向(默认取below)
   minimum node distance = 6mm, % 最小结点间距(默认取6mm)
   maximum node distance = 60mm, % 最大结点间距(默认取60mm)
@@ -101,14 +109,14 @@
   % 顺序处理框样式
   proc/.style={base,           % 基础样式  
                rectangle,      % 矩形边框
-               text width=8em, % 最大文本宽度(超过会自动换行)
+               text width=\proctxtwd, % 最大文本宽度(超过会自动换行)
                fill=\procfillcolor, % 填充色
               },
   % 判断框样式
   test/.style={base,           % 基础样式
                diamond,        % 菱形边框
                aspect=2.5,       % 长高比例
-               text width=5em, % 最大文本宽度(超过会自动换行)
+               text width=\testtxtwd, % 最大文本宽度(超过会自动换行)
                fill=\testfillcolor, % 填充色
               },
   % 输入/输出框样式
@@ -116,13 +124,13 @@
              trapezium,                 % 平行四边形
              trapezium left angle=70,   % 平行四边形左倾角
              trapezium right angle=110, % 平行四边形右倾角
-             text width=6em,            % 最大文本宽度(超过会自动换行)
+             text width=\iotxtwd,            % 最大文本宽度(超过会自动换行)
              fill=\iofillcolor, % 填充色
             },
   % 开始/结束框样式
   term/.style={proc,            % 基于proc样式
                rounded corners=2.0mm, % 为矩形添加圆角属性
-               text width=3em, % 最大文本宽度(超过会自动换行) 
+               text width=\termtxtwd, % 最大文本宽度(超过会自动换行) 
                fill=\termfillcolor, % 填充色
               },
   % 流程连接点样式
