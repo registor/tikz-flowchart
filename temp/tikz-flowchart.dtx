@@ -1,0 +1,634 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2019 by Geng Nan <nangeng@nwsuaf.edu.cn>
+%
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3 of this license or (at your option) any later
+% version.  The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<package>\NeedsTeXFormat{LaTeX2e}[2011/06/27]
+%<package>\ProvidesPackage{tikz-flowchart}
+%<package>  [2019/08/20 v1.0.01 draw flowchart using TikZ]
+%
+%<*driver>
+\documentclass[a4paper]{ltxdoc}
+\RecordChanges
+
+\usepackage{ctex}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz-flowchart}
+\usepackage{float}
+%\usepackage{parskip}
+
+% default position for floats: H
+\makeatletter
+\renewcommand{\fps@figure}{H}
+\renewcommand{\fps@table}{H}
+\makeatother
+
+%\setlength{\parindent}{0pt}
+
+\def\pkg{\texttt{tikz-flowchart}}
+\def\tkz{Ti\emph{k}Z}
+
+\begin{document}
+  \DocInput{tikz-flowchart.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+% \changes{v1.0.01}{2019/08/20}{chang .sty file to .dtx file}
+%
+% \GetFileInfo{tikz-flowchart.sty}
+%
+% \title{\texttt{tikz-flowchart}---\tkz 流程图绘制宏包\thanks{该文档是 \texttt{tikz-flowchart}~\fileversion, dated~\filedate 的说明文档。}}
+% \author{耿楠\thanks{https://github.com/registor/tikz-flowchart}\\ 西北农林科技大学信息工程学院计算机科学系}
+% \date{\filedate}
+% \thispagestyle{empty}
+% \maketitle
+%
+% \begin{abstract}
+%   这是一个使用\tkz 绘制传统程序流程图的简单宏包，通过定义\texttt{proc}、\texttt{test}、\texttt{io}、\texttt{term}等\tkz 的\texttt{node}命令样式实现。
+% 该宏包核心代码摘录自\href{http://www.texample.net/tikz/examples/author/brent-longborough/}{Brent Longborough}设计的流程图绘制样例，
+% 参考了\texttt{tikz-imagelabels}宏包的设计思路，提供了\texttt{\textbackslash flowchartset}命令以设置绘制参数。
+% \end{abstract}
+%
+% \tableofcontents
+%
+% \PrintChanges
+%
+% \StopEventually{}
+%
+% \section{宏包简介}
+%
+% 流程图是诸如手册、报告、论文等文档中经常用到的排版元素，\pkg{}宏包的目的是为了更为方便地实现传统流程图的绘制。
+%
+% \clearpage
+% \autoref{fig:pleiades}由如下代码绘制:
+% \begin{verbatim}
+% \begin{annotationimage}{width=6cm}{pleiades.jpg}
+%   \draw[annotation left = {Atlas at 0.3}] to (0.11,0.4);
+%   \draw[annotation left = {Pleione at 0.55}] to (0.11,0.49);
+%   \draw[annotation left = {Alcyone at 0.8}] to (0.39,0.45);
+%   \draw[annotation below = {Merope at 0.5}] to (0.58,0.28);
+%   \draw[annotation right = {Electra at 0.3}] to (0.84,0.45);
+%   \draw[annotation right = {Caleano at 0.75}] to (0.85,0.64);
+%   \draw[annotation above = {Maia at 0.4}] to (0.67,0.72);
+%   \draw[annotation above = {Taygeta at 0.9}] to (0.78,0.82);
+%   \draw[image label = {M45 at south east}];
+% \end{annotationimage}
+% \end{verbatim}
+%
+% \section{使用方法}
+%
+% \subsection{布置结点}
+%
+% \DescribeEnv{annotationimage}
+% To include an image, the |annotationimage| environment is used. It
+% has the following syntax:
+%
+% |annotationimage|\oarg{grid}\marg{options}\marg{file name}
+%
+% The \meta{grid} is an optional parameter. If this parameter is present, i.e.
+% if it has the value |[grid]|, then a coordinate grid is visible. The
+% coordinate grid is used to find the coordinates of the points to be labelled.
+% If the parameter \meta{grid} is omitted, no coordinate grid is drawn. The code
+%
+% \begin{verbatim}
+% \begin{annotationimage}[grid]{width=6cm}{pleiades.jpg}
+% \end{annotationimage}
+% \end{verbatim}
+%
+% produces the image shown in \autoref{fig:grid-example}.
+%
+% \meta{options} is any set of options understood by the
+% |\includegraphics| command, e.g. |width=|, |height=| and so on. It may also be
+% left empty, but in this case, the curly braces need to be there, though.
+%
+% The \meta{file name} is, obviously, the file name of the image. Like for the
+% \meta{options}, any image format supported by |\includegraphics| may be used.
+%
+% \subsection{Adding a label}
+%
+% A label (like the ``M45'' in \autoref{fig:pleiades}) can be added to the image
+% using following |\draw| macro:
+%
+% |\draw[image label = {|\meta{text}| at |\meta{placement}|}];|
+%
+% The \meta{text} parameter is obvious. It contains the text to be put into the
+% label.
+%
+% The \meta{placement} dictates the placement of the label. It may be one of
+% |north west|, |north|, |north east|, |east|, |south east|, |south|,
+% |south west| or |west|. Also |center| is possible, even though it possibly
+% doesn't make a lot of sense. \autoref{fig:label_example} shows an example
+% with several labels.
+%
+% The label in \autoref{fig:pleiades} was drawn using the following code:
+%
+% |\draw[image label = {M45 at south east}];|
+%
+% Another kind of label is the so-called ``coordinate label''. In contrast to
+% the image label, it may be positioned at arbitrary coordinates. The syntax is
+% similar to the |image label|:
+%
+% |\draw[coordinate label = {|\meta{text}| at (|\meta{coordinate}|)}];|
+%
+% An example of some coordinate labels is shown in \autoref{fig:coord-labels}.
+%
+%
+% \autoref{fig:coord-labels} was created using the following code:
+% \begin{verbatim}
+%   \draw[coordinate label = {1 at (0.1,0.3)}];
+%   \draw[coordinate label = {2 at (0.4,0.6)}];
+%   \draw[coordinate label = {3 at (0.65,0.25)}];
+%   \draw[coordinate label = {4 at (0.9,0.4)}];
+%   \draw[coordinate label = {5 at (0.62,0.62)}];
+%   \draw[coordinate label = {6 at (0.83,0.8)}];
+%   \draw[image label = {M45 at south east}];
+% \end{verbatim}
+%
+% \subsection{Adding annotations}
+%
+% An annotation is added with the aid of the \tkz{} macro |\draw|. The syntax is
+% as follows:
+%
+% |\draw[annotation |\meta{placement}| = {|\meta{text}| at |\meta{position}|}] to (|\meta{x}|, |\meta{y}|);|
+%
+% The \meta{placement} is one of: |above|, |right|, |below| or |left|. It tells
+% on which side of the image the annotation will appear. \meta{above} and
+% \meta{below} basically determine the $y$ coordinate of the text, while
+% \meta{left} and \meta{right} determine the $x$ coordinate of the text. The
+% remaining coordinate is determined using the \meta{position}.
+%
+% The \meta{text} is the actual text of the annotation.
+%
+% The \meta{x} and \meta{y} parameters are the actual coordinates where the
+% arrow should point to. Note that \pkg{} will automatically insert a small
+% distance between the arrow's tip and the coordinate given, such that the
+% arrow is close to the coordinate but does not cover it.
+%
+% For example, the code
+%
+% |\draw[annotation left = {Atlas at 0.3}] to (0.11,0.4);|
+%
+% draws the text ``Atlas'' on the left-hand side of the image, at $y=0.3$. The
+% arrow will point towards coordinate $(0.11, 0.4)$ but ends shortly before this
+% coordinate such that the interesting feature to be labelled is not covered by
+% the arrow's tip.
+%
+% \section{Configuring styles}
+%
+% \DescribeMacro{\flowchartset}
+% Various options, like font size and so on, can be configured with the
+% |\flowchartset| macro. It uses the key-value syntax from \tkz{}, e.g.:
+%
+% |\flowchartset{|\meta{key}| = |\meta{value}|, ...}|
+%
+% Multiple \meta{key} and \meta{value} pairs may be combined. The following
+% sections list all possible configurations.
+%
+% |\flowchartset| can be put anywhere, but it makes sense to put it into the
+% preamble of a document to ensure all images have the same look.
+%
+% There is also a default style. If no |\flowchartset| command is present, the
+% default values for all options are taken. The default style used is as
+% follows:
+%
+% \begin{verbatim}
+% \flowchartset{
+%   coarse grid color = red,
+%   fine grid color = gray,
+%   image label font = \sffamily\bfseries\small,
+%   image label distance = 2mm,
+%   image label back = black,
+%   image label text = white,
+%   coordinate label font = \sffamily\bfseries\scriptsize,
+%   coordinate label distance = 2mm,
+%   coordinate label back = black,
+%   coordinate label text = white,
+%   annotation font = \normalfont\small,
+%   arrow distance = 1.5mm,
+%   border thickness = 0.6pt,
+%   arrow thickness = 0.4pt,
+%   tip size = 1.2mm,
+%   outer dist = 0.5cm,
+% }
+% \end{verbatim}
+%
+% The individual keys are described in the following sections.
+%
+% \subsection{Grid color}
+%
+% In most cases, it will not be necessary to adjust the grid colors. However,
+% depending on the image, it may be desirable to do so. This is exactly what the
+% \meta{coarse grid color} and \meta{fine grid color} are used for. Any color
+% specification compatible to \tkz{} may be used. The defaults are red for the
+% coarse grid and gray for the fine grid.
+%
+% \subsection{Font and color for the labels}
+%
+% The font for the image labels may be configured with \meta{image label font}.
+% By default, the image labels are typeset with bold, small, sans-serif font.
+%
+% The background color of the image labels may be set using the
+% \meta{image label back} kay, whereas the text color is specified with the
+% \meta{image label text} key. Defaults for the background color and for the
+% text color are black and white, respectively.
+%
+% \subsection{Distance of image labels to the image border}
+%
+% The \meta{image label distance} key configures the distance, $d$, from the
+% image's border to the border of the image label, as shown in
+% \autoref{fig:imagelabeldistance_example}. By default, it is set to 2\,mm.
+%
+% \begin{figure}
+% \centering
+% \flowchartset{
+%    image label distance = 1cm}
+% \begin{annotationimage}{width=5cm}{example-image}
+%   \draw[image label = {Label at south east}];
+%   \draw[>=latex, red, <->] (1,0.3) -- ++(-1cm,0) node[above, midway] {$d$};
+%   \draw[>=latex, red, <->] (0.7,0) -- ++(0,1cm) node[midway, right] {$d$};
+% \end{annotationimage}
+% \caption{Illustration of the \meta{image label distance}}
+% \label{fig:imagelabeldistance_example}
+% \end{figure}
+%
+% \subsection{Font for annotations}
+%
+% The font used for annotations is set by \meta{annotation font}. By default,
+% the |\normalfont| is used with small size.
+%
+% \subsection{Distance of arrow tips}
+%
+% As mentioned earlier, the arrows are shortened such that their tips don't
+% cover the desired point. \autoref{fig:arrowdistance_example} illustrates this.
+% All the arrows point to the same coordinate, $(0.5, 0.5)$, but they end at
+% the distance $x$ away from the point. This distance may be configured using
+% the \meta{arrow distance}. By default, this distance is set to 1.5\,mm. This
+% ensures that the arrow tips are close enough to the interesting features, but
+% not so close that they cover important parts of the image.
+%
+% \begin{figure}
+% \centering
+% \flowchartset{arrow distance = 1cm}
+% \begin{annotationimage}{width=5cm}{example-image}
+%   \draw[annotation right = {text at 0.5}] to (0.5,0.5);
+%   \draw[annotation left = {text at 0.1}] to (0.5,0.5);
+%   \draw[annotation left = {text at 0.7}] to (0.5,0.5);
+%   \draw[annotation below = {text at 0.4}] to (0.5,0.5);
+%   \draw[annotation above = {text at 0.8}] to (0.5,0.5);
+%   \draw[red] (0.5,0.5) circle[radius = 1cm];
+%   \draw[>=latex, red, <->] (0.5,0.5) -- ++(60:1cm) node[midway, left] {$x$};
+% \end{annotationimage}
+% \caption{Illustration of the \meta{arrow distance}}
+% \label{fig:arrowdistance_example}
+% \end{figure}
+%
+% \subsection{Thickness and size of the arrows}
+%
+% The arrows themselves consist of two parts: the inner part, which is the
+% actual arrow, and the border, which is, by default, a white border around the
+% arrow. The border is required to ensure that each arrow is visible, no matter
+% on what background it is drawn. The thickness of the black line can be
+% configured using the \meta{arrow thickness}, whose default value is 0.4\,pt.
+% The thickness of the border around the arrow is configured with the
+% \meta{border thickness}, having a default value of 0.6\,pt.
+%
+% The size of the round dot at the end of the arrows is configured using the
+% \meta{tip size}. \autoref{fig:arrowthickness_tipsize_example} illustrates
+% both, the \meta{arrow thickness}, and the \meta{tip size}, as parameters
+% $a$ and $b$, respectively.
+%
+% \begin{figure}
+% \centering
+% \flowchartset{arrow thickness = 1cm, tip size = 2cm, arrow distance=0}
+%   \let\tikzset\flowchartset
+% \begin{tikzpicture}
+%   \draw[annotation arrow] (0,0) -- (4cm,0);
+%   \draw[>=latex, red, <->] (0.5,-0.5) -- ++(0,1cm) node[right, midway] {$a$};
+%   \draw[>=latex, red, <->] (3cm,-1cm) -- ++(0,2cm) node[right, midway] {$b$};
+% \end{tikzpicture}
+% \caption{Illustration of the \meta{arrow thickness}, $a$, and
+% the \meta{tip size}, $b$}
+% \label{fig:arrowthickness_tipsize_example}
+% \end{figure}
+%
+% \subsection{Distance of annotation texts from the image}
+%
+% The parameter \meta{outer dist} configures how far away from the image the
+% annotation texts will be positioned. By default, this value is 0.5\,cm.
+%
+% \section{Implementation}
+% The only packages required are |tikz| and |xifthen|. If not already loaded,
+% they will be loaded automatically.
+%    \begin{macrocode}
+\RequirePackage{tikz}
+\RequirePackage{xifthen}
+%    \end{macrocode}
+% Some \tkz{} libraries are also reuiqred for proper operation.
+%    \begin{macrocode}
+\usetikzlibrary{
+  arrows.meta,
+  calc,
+  positioning,
+  decorations,
+  decorations.markings,
+  math,
+}
+%    \end{macrocode}
+% \subsection{Configuration}
+% For the |\flowchartset| command, a |pgfkeys| family is defined. All
+% configurations (e.g. \meta{tip size} and so on) and styles are stored in the
+% PGF key |/flowchart|. This ensures that these configurations don't overwrite
+% any other parameters the user may have set elsewhere.
+%    \begin{macrocode}
+\pgfkeys{
+  /flowchart/.is family,
+  /flowchart/.search also={/tikz},
+}
+
+\def\flowchartset{\pgfqkeys{/flowchart}}
+%    \end{macrocode}
+% Then, a set of macros is created which stores the values for the individual
+% configuration options.
+%    \begin{macrocode}
+\flowchartset{
+  coarse grid color/.store in = \maingridcolor,
+  fine grid color/.store in = \finegridcolor,
+}
+
+\flowchartset{
+  image label font/.store in = \imagelabelfont,
+  image label distance/.store in = \flowchartep,
+  image label back/.store in = \imagelabelback,
+  image label text/.store in = \imagelabeltext,
+}
+
+\flowchartset{
+  coordinate label font/.store in = \coordinatelabelfont,
+  coordinate label distance/.store in = \coordinatelabelsep,
+  coordinate label back/.store in = \coordinatelabelback,
+  coordinate label text/.store in = \coordinatelabeltext,
+}
+
+\flowchartset{
+  annotation font/.store in = \annotationfont,
+  arrow distance/.store in = \arrowdistance,
+  arrow thickness/.store in = \arrowthickness,
+  tip size/.store in = \tipsize,
+  border thickness/.store in = \borderthickness,
+  outer dist/.store in = \labeloutersep,
+}
+%    \end{macrocode}
+%
+% \subsection{Default configuration}
+% The default configuration is set. This will ensure that each of the previously
+% defined macros has a valid initial value, which may be overwritten by the
+% user.
+%    \begin{macrocode}
+\flowchartset{
+  coarse grid color = red,
+  fine grid color = gray,
+  image label font = \sffamily\bfseries\small,
+  image label distance = 2mm,
+  image label back = black,
+  image label text = white,
+  coordinate label font = \sffamily\bfseries\scriptsize,
+  coordinate label distance = 2mm,
+  coordinate label back = black,
+  coordinate label text = white,
+  annotation font = \normalfont\small,
+  arrow distance = 1.5mm,
+  border thickness = 0.6pt,
+  arrow thickness = 0.4pt,
+  tip size = 1.2mm,
+  outer dist = 0.5cm,
+}
+%    \end{macrocode}
+%
+% \subsection{Environment declaration}
+% Next, the |annotationimage| environment is declared. It takes 3 arguments,
+% the first of which is optional. If it is omitted, its default value is empty.
+%    \begin{macrocode}
+\newenvironment{annotationimage}[3][]{
+%    \end{macrocode}
+% Each time a new |annotationimage| environment is opened, this code will ensure
+% that all the definitions stored under the PGF key |/flowchart| are loaded.
+% Then, a new |tikzpicture| is created.
+%    \begin{macrocode}
+\let\tikzset\flowchartset
+  \begin{tikzpicture}
+%    \end{macrocode}
+% The 2nd and 3rd arguments to the |annotationimage| are the size/scaling
+% options for the image, as well as the actual image file. Thus, a new \tkz{}
+% node called |image| is created; the node's content is the image.
+%    \begin{macrocode}
+  \node[anchor=south west, inner sep=0]
+    (image) at (0,0) {\includegraphics[#2]{#3}};
+%    \end{macrocode}
+% Using a scope ensures that the top-right corner always has coordinate $(1,1)$.
+%    \begin{macrocode}
+  \begin{scope}[x={(image.south east)},y={(image.north west)}]
+%    \end{macrocode}
+% Next, the first (optional) argument's value is checked. If the user said
+% |[grid]| to the first argument, the following code is executed.
+%    \begin{macrocode}
+  \ifthenelse{\equal{#1}{grid}}{%
+%    \end{macrocode}
+% This actually draws the coordinate grid.
+%    \begin{macrocode}
+    \draw[very thin, draw=\finegridcolor, step=0.02]
+      (0,0) grid (1,1);
+    \draw[thin, draw=\maingridcolor, xstep=0.1, ystep=0.1]
+      (0,0) grid (1,1);
+%    \end{macrocode}
+% then, the labels are put to the coordinate axes.
+%    \begin{macrocode}
+    \foreach \x in {0,1,...,9} {
+      \node [anchor=north] at (\x/10,0) {\tiny 0.\x};
+    }
+    \node [anchor=north] at (1,0) {\tiny 1};
+
+    \foreach \y in {0,1,...,9} {
+      \node [anchor=east] at (0,\y/10) {\tiny 0.\y};
+    }
+    \node [anchor=east] at (0,1) {\tiny 1};
+  }{}
+}
+{
+%    \end{macrocode}
+% Each time the |annotationimage| environment is closed, the previously opened
+% |scope| and |tikzpicture| environments need to be closed as well.
+%    \begin{macrocode}
+ \end{scope}
+ \end{tikzpicture}}
+%    \end{macrocode}
+%
+% \subsection{Style definitions for the annotations}
+% What follows is the definition of the styling for the annotations.
+%    \begin{macrocode}
+\flowchartset{
+%    \end{macrocode}
+% This is the style for the annotation arrow itself.
+%    \begin{macrocode}
+  annotation arrow/.style =
+  {
+%    \end{macrocode}
+% The |preaction| first draws a thick white arrow. This arrow will become the
+% border.
+%    \begin{macrocode}
+    preaction =
+    {
+      draw,
+      -{Circle[fill=white, length=\tipsize+2*\borderthickness,
+        width=\tipsize+2*\borderthickness]},
+      line width = 2*\borderthickness + \arrowthickness,
+      white,
+      shorten >= \arrowdistance,
+    },
+%    \end{macrocode}
+% After the |preaction| has been performed, this will actually draw the
+% ``normal'' arrow.
+%    \begin{macrocode}
+    draw,
+    -{Circle[fill=black, length=\tipsize, width=\tipsize]},
+    black,
+    line width = \arrowthickness,
+    shorten >= \borderthickness + \arrowdistance,
+  },
+%    \end{macrocode}
+% All the annotation texts have a common style. This ensures they have the same
+% font etc. Setting the |inner sep| to 0.5\,ex ensures that the distance between
+% the text and the arrow is somewhat aesthetic. It is an empirically determined
+% value.
+%    \begin{macrocode}
+  annotation node/.style =
+  {
+    font=\annotationfont,
+    inner sep = 0.5ex,
+  },
+%    \end{macrocode}
+% Next comes the styles for the different annotation placements. For an
+% annotation being below the image, this style applies.
+%    \begin{macrocode}
+  annotation below/.style args = {#1 at #2}{
+%    \end{macrocode}
+% Using the annotation arrow style tells \tkz{} to draw an arrow as specified
+% above, using the geometry defined with |\flowchartset|.
+%    \begin{macrocode}
+    annotation arrow,
+%    \end{macrocode}
+% After the arrow has been drawn, a further path is inserted, which is the
+% actual annotation text. For the annotations being above and below the image
+% special care must be taken: a |\strut| is appended to the label text to ensure
+% that texts being on the same side of the image are on the same line. Without
+% the strut, the texts may be differently aligned, depending on their letters --
+% e.g. letters ``p'' and ``g'' go slightly further down in the $y$ direction
+% than ``a'' or ``b''.
+%    \begin{macrocode}
+    insert path = {
+      (#2,0) ++ (0,-\labeloutersep)
+        node[anchor = north, annotation node] {#1\strut}
+    }
+  },
+%    \end{macrocode}
+% The remaining annotation styles are defined similarly.
+%    \begin{macrocode}
+  annotation above/.style args = {#1 at #2}{
+    annotation arrow,
+    insert path = {
+      (#2,1.0) ++ (0,\labeloutersep)
+        node[anchor = south, annotation node] {#1\strut}
+    }
+  },
+  annotation left/.style args = {#1 at #2}{
+    annotation arrow,
+    insert path = {
+      (0,#2) ++ (-\labeloutersep,0)
+        node[anchor = east, annotation node] {#1}
+    }
+  },
+  annotation right/.style args = {#1 at #2}{
+    annotation arrow,
+    insert path = {
+      (1.0,#2) ++ (\labeloutersep,0)
+        node[anchor = west, annotation node] {#1}
+    }
+  },
+}
+%    \end{macrocode}
+%
+% \subsection{Style definitions for the labels}
+% Next follows the style definition for the image labels. A general style
+% defines the appearance and color.
+%    \begin{macrocode}
+\flowchartset{
+  image label style/.style = {
+    rectangle,
+    minimum width = 5mm,
+    minimum height = 5mm,
+    fill = \imagelabelback,
+    text = \imagelabeltext,
+    font = \imagelabelfont,
+  },
+  coordinate label style/.style = {
+    rectangle,
+    minimum width = 3mm,
+    minimum height = 3mm,
+    fill = \coordinatelabelback,
+    text = \coordinatelabeltext,
+    font = \coordinatelabelfont,
+  },
+%    \end{macrocode}
+% On the other hand, the |image label| style defines the actual image labels.
+%    \begin{macrocode}
+  image label/.style args = {#1 at #2}{
+    insert path = {
+      (image.#2) node[outer sep = \flowchartep,
+        anchor=#2, image label style] {#1}
+    }
+  },
+  coordinate label/.style args = {#1 at (#2)}{
+    insert path = {
+      node[outer sep = \coordinatelabelsep,
+        anchor=center, coordinate label style] at (#2) {#1}
+    }
+  },
+}
+%    \end{macrocode}
+%
+% \Finale
+\endinput
