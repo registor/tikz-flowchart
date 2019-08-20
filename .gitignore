@@ -135,7 +135,7 @@ dkms.conf
 .*.lb
 
 ## Core dtx auxiliary files:
-*.ins
+##*.ins
 
 ## Intermediate documents:
 *.dvi

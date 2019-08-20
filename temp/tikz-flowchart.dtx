@@ -23,15 +23,19 @@
 \documentclass[a4paper]{ltxdoc}
 \RecordChanges
 
-\usepackage{ctex}
+\usepackage[UTF8,scheme=chinese]{ctex}
+\usepackage{csquotes}
 \usepackage{lmodern}
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{tikz-flowchart}
+\usepackage[debug]{tikz-flowchart}
 \usepackage{float}
-%\usepackage{parskip}
+% \usepackage{parskip}
+
+\renewcommand\figureautorefname\figurename
+\renewcommand\tableautorefname\tablename
 
 % default position for floats: H
 \makeatletter
@@ -100,18 +104,18 @@
 %   \centering
 %   \begin{tikzpicture}[scale=0.85]
 %     \node [proc] (p1) {表达式1};      
-%     \node [test, join, text width = 5em] (t1) {表达式2?};
+%     \node [test, join] (t1) {表达式2?};
 %     \node [proc] (p2) {循环体};
 %     \node [proc, join] (p3) {表达式3};
 %
-%     \node [coord, above = 0.5 of p1] (c1)  {}; \cmark{1}
-%     \node [coord] (c2) at ($(p1)!0.35!(t1)$)  {}; \cmark{2}
-%     \node [coord, below = 0.25 of p3] (c3)  {}; \cmark{3}
-%     \node [coord, below = 0.2 of c3] (c4) {}; \cmark{4}
-%     \node [coord, below = 0.5 of c4] (c5) {}; \cmark{5}
-%     \node [coord, right = 0.5 of t1] (c6) {}; \cmark{6}
-%     \node [coord, left = 0.5 of t1] (ct) {}; \cmark{t}
-%     \node [coord] (c7) at (c3 -| ct)  {}; \cmark{7}
+%     \node [coord, above = 0.5 of p1] (c1)  {};
+%     \node [coord] (c2) at ($(p1)!0.35!(t1)$)  {};
+%     \node [coord, below = 0.25 of p3] (c3)  {};
+%     \node [coord, below = 0.2 of c3] (c4) {};
+%     \node [coord, below = 0.5 of c4] (c5) {};
+%     \node [coord, right = 0.5 of t1] (c6) {};
+%     \node [coord, left = 0.5 of t1] (ct) {};
+%     \node [coord] (c7) at (c3 -| ct)  {};
 % 
 %     \path (t1.south) -- node [near start, right] {$Y$} (p2.north);
 %     \draw [norm] (t1.south) -- (p2.north);
@@ -130,7 +134,7 @@
 % \begin{tikzpicture}[scale=0.85]
 %   % 布置结点
 %   \node [proc] (p1) {表达式1};      
-%   \node [test, join, text width = 5em] (t1) {表达式2?};
+%   \node [test, join] (t1) {表达式2?};
 %   \node [proc] (p2) {循环体};
 %   \node [proc, join] (p3) {表达式3};
 %   % 布置用于连接的坐标结点，同时为其布置调试标记点。
@@ -154,12 +158,300 @@
 % \end{tikzpicture}
 % \end{verbatim}
 %
+% \emph{注意：}所有绘图代码都需在|tikzpicture|环境中完成。
 % \section{使用方法}
 % \subsection{载入宏包}
 % 在导言区使用：\texttt{\textbackslash annotationimage}\oarg{debug}\marg{\pkg{}}命令
 % 载入宏包。如果带有\oarg{debug}参数，则可以绘制用于调试的流程线转角点
-% 标记，否则，则不绘制该标记。
+% 标记，否则，则不绘制该标记，\autoref{fig:forloopcmark}是带有
+% \oarg{debug}参数时的绘制结果。
+
+% \begin{figure}[!htp]
+%   \centering
+%   \begin{tikzpicture}[scale=0.85]
+%     \node [proc] (p1) {表达式1};      
+%     \node [test, join] (t1) {表达式2?};
+%     \node [proc] (p2) {循环体};
+%     \node [proc, join] (p3) {表达式3};
+%
+%     \node [coord, above = 0.5 of p1] (c1)  {}; \cmark{1}
+%     \node [coord] (c2) at ($(p1)!0.35!(t1)$)  {}; \cmark{2}
+%     \node [coord, below = 0.25 of p3] (c3)  {}; \cmark{3}
+%     \node [coord, below = 0.2 of c3] (c4) {}; \cmark{4}
+%     \node [coord, below = 0.5 of c4] (c5) {}; \cmark{5}
+%     \node [coord, right = 0.5 of t1] (c6) {}; \cmark{6}
+%     \node [coord, left = 0.5 of t1] (ct) {}; \cmark{t}
+%     \node [coord] (c7) at (c3 -| ct)  {}; \cmark{7}
+% 
+%     \path (t1.south) -- node [near start, right] {$Y$} (p2.north);
+%     \draw [norm] (t1.south) -- (p2.north);
+%     \path (t1.east) -- node [near start, above] {$N$} (c6);
+%     \draw [norm] (t1.east) -- (c6) |- (c4) -- (c5);
+%
+%     \draw [norm] (c1) -- (p1);
+%     \draw [norm] (p3.south) |- (c7) |- (c2);
+%   \end{tikzpicture}
+%   \caption{for循环流程图}
+%   \label{fig:forloopcmark}
+% \end{figure}
 % \subsection{布置结点}
+% 使用类似``\verb|\node [proc](p1){表达式1};|''\tkz{} 绘图命令，采用\pkg{}
+% 定义的``\verb|proc|''、``\verb|test|''、``\verb|io|''或
+% ``\verb|term|''的\enquote{node样式}参数布置需要的流程框结点。
+%
+% 在布置结点时，如果前一个结点不是``\verb|test|''样式，则可以使用
+% ``\verb|join|''参数自动与前一个结点建立连接，如
+% ``\verb|\node [proc, join] (p3) {表达式3};|''，同时绘制对应流程线。
+%
+% 另外，可以根据需要同时对布置的结点进行命名(如``\verb|p1|''、
+% ``\verb|t1|''等)，以便后续对该结点进行引用。
+%
+% \subsection{布置坐标点}
+% 使用类似``\verb|\node [coord, above = 0.5 of p1] (c1)  {}; \cmark{1}|''
+% \tkz{} 绘图命令，采用\pkg{}
+% 定义的``\verb|coord|''的样式参数布置其它需要的坐标点
+% (用于流程线的转接)。同时，也可以使用``\verb|cmark|''命令为该点作出标
+% 记，以方便调试流程线连线。该标记在使用``\verb|debug|''可选参数引入
+% ``\verb|\usepackage[debug]{tikz-flowchart}|''宏包时，将绘制这些标记
+% 点，若引入宏包时无``\verb|debug|''可选参数，则不绘制该标记点。
+%
+% \subsection{绘制流程线}
+% 首先使用类似``\verb|\path(t1.south)--node[near start,right]{$Y$}(p2.north);|''
+% 的路径命令绘制流程线标注。
+%
+% 然后使用类似``\verb!\draw[norm](t1.east)--(c6)|-(c4)--(c5);!''
+% 绘制命令绘制带有箭头的流程线。
+%
+% \subsection{绘制流程线}
+% 首先使用类似``\verb|\path(t1.south)--node[near start,right]{$Y$}(p2.north);|''
+% 的路径命令绘制流程线标注。
+%
+% 然后使用类似``\verb!\draw[norm](t1.east)--(c6)|-(c4)--(c5);!''
+% 绘制命令绘制带有箭头的流程线。
+%
+% 在绘制流程线时，可以使用``\verb|lnorm|''、``\verb|lfree|''或
+% ``\verb|lcong|''指定颜色的样式绘制无箭头的流程线，用``\verb|norm|''、
+% ``\verb|free|''或``\verb|cong|''指定颜色的样式绘制有箭头的流程线。
+%
+% 建立先绘制南北方向流程线，再绘制东西方向流程线。
+%
+% 在绘制流程线时，可以使用``\verb|dotnorm|''、``\verb|dotfree|''和
+% ``\verb|dotcong|''样式绘制流程线实心交点，用``\verb|cdotnorm|''、
+% ``\verb|cdotfree|''或``\verb|cdotcong|''样式绘制流程线空心交点。
+%
+% 对于不相交的流程线，可以用``\verb|connect|''样式进行绘制。
+%
+% \subsection{其它命令}
+% 可以使用任何合法的\tkz{}命令为流程图绘制需要的图形。
+%
+% \section{参数设置}
+%
+% \subsection{全局设置}
+% 可以在导言区使用\verb|\flowchartset{}|命令设置需要的绘图全局设置。
+%
+% \begin{verbatim}
+% \flowchartset{
+%   free color = green,                % 自由连线颜色(默认取green)
+%   norm color = blue,                 % 常规连线颜色(默认取blue)
+%   cong color = red,                  % 关联连线颜色(默认取red)
+%   proc fill color = white,           % 顺序处理框填充颜色(默认取白色)
+%   test fill color = white,           % 判断框填充颜色(默认取白色)
+%   io fill color = white,             % 输入/输出框填充颜色(默认取白色)
+%   term fill color = white,           % 开始/结束框填充颜色(默认取白色)
+%   proc text width = 8em,             % 顺序处理框宽度(默认取8em)
+%   test text width = 5em,             % 判断框宽度(默认取5em)
+%   io text width = 6em,               % 输入/输出框宽度(默认取6em)
+%   term text width = 3em,             % 开始/结束宽度(默认取3em)
+%   chain direction = below,           % 结点自动布置方向(默认取below)
+%   minimum node distance = 6mm,       % 最小结点间距(默认取6mm)
+%   maximum node distance = 60mm,      % 最大结点间距(默认取60mm)
+%   border line width = \pgflinewidth, % 流程框边框宽度(默认取当前线条宽度)
+%   flow line width = \pgflinewidth,   % 流程线线条宽度(默认取当前线条宽度)
+%   stealth length = 1.5mm,            % 箭头长度(默认取1.5mm)
+%   stealth width = 1.0mm,             % 箭头宽度(默认取1.0mm)
+% }
+% \end{verbatim}
+%
+% 在进行参数设置时，可以仅指定需要的参数，如：
+% \begin{verbatim}
+% \flowchartset{
+%   free color = green,                % 自由连线颜色(默认取green)
+%   norm color = black,                 % 常规连线颜色(默认取blue)
+%   cong color = red,                  % 关联连线颜色(默认取red)
+% }
+% \end{verbatim}
+%
+% 可以指定``\verb|norm|''类型的颜色为``\verb|black|''，可以得到
+% \autoref{fig:forloopblack}所示的黑色流程线流程图。
+%
+% \flowchartset{
+%   free color = green,
+%   norm color = black,
+%   cong color = red,
+% }
+%   
+% \begin{figure}[!htp]
+%   \centering
+%   \begin{tikzpicture}[scale=0.85]
+%     \node [proc] (p1) {表达式1};      
+%     \node [test, join] (t1) {表达式2?};
+%     \node [proc] (p2) {循环体};
+%     \node [proc, join] (p3) {表达式3};
+%
+%     \node [coord, above = 0.5 of p1] (c1)  {};
+%     \node [coord] (c2) at ($(p1)!0.35!(t1)$)  {};
+%     \node [coord, below = 0.25 of p3] (c3)  {};
+%     \node [coord, below = 0.2 of c3] (c4) {};
+%     \node [coord, below = 0.5 of c4] (c5) {};
+%     \node [coord, right = 0.5 of t1] (c6) {};
+%     \node [coord, left = 0.5 of t1] (ct) {};
+%     \node [coord] (c7) at (c3 -| ct)  {};
+% 
+%     \path (t1.south) -- node [near start, right] {$Y$} (p2.north);
+%     \draw [norm] (t1.south) -- (p2.north);
+%     \path (t1.east) -- node [near start, above] {$N$} (c6);
+%     \draw [norm] (t1.east) -- (c6) |- (c4) -- (c5);
+%
+%     \draw [norm] (c1) -- (p1);
+%     \draw [norm] (p3.south) |- (c7) |- (c2);
+%   \end{tikzpicture}
+%   \caption{for循环流程图}
+%   \label{fig:forloopblack}
+% \end{figure}
+%
+% \subsection{局部设置}
+% 也可以在需要的位置使用\verb|\flowchartset{}|命令进行需要的绘图局部设
+% 置。例如，可以使用如下代码绘制如\autoref{fig:colorflowchart}所示的彩
+% 色流程图。
+%
+% \begin{verbatim}
+% \flowchartset{
+%   proc fill color = orange!10,
+%   test fill color = green!30,
+%   io fill color = blue!30,
+%   term fill color = red!30,
+%   proc text width = 6em,
+%   test text width = 10em,
+% }
+%   
+% \begin{figure}[!htp]
+%   \centering
+%   \begin{tikzpicture}
+%     % 布置结点单元
+%     \node [term] (st) {开始};
+%     \node [proc, join] (p1) {\verb|int divisor|};       
+%     \node [test, join] (t1) {\verb|n <= 1|};
+%     \node [proc] (p2) {\verb|divisor = 2|};
+%     \node [test, join] (t2) {\verb|divisor * divisor <= n|};
+%     \node [test] (t3) {\verb|n % divisor == 0|};
+%     \node [proc] (p3) {\verb|divisor++|};
+%     \node [term, below = 1.6 of p3] (end) {结束};
+%     \node [proc, left = 4.8 of t2] (p4) {\verb|return 0|};
+%     \node [proc, right = 3.5 of p3] (p5) {\verb|return 0|};
+%     \node [proc, right = 5.8 of t3] (p6) {\verb|return 1|};
+%
+%     % 布置用于连接的坐标结点，同时为其布置调试标记点。
+%     \node [coord] (c1) at ($(p2.south)!0.5!(t2.north)$)  {};
+%     \node [coord, below = 0.25 of p3] (c2)  {};
+%     \node [coord, above = 0.5 of end] (c3) {};
+%     \node [coord, left = 0.5 of t2] (ct) {};
+%     \node [coord] (c4) at (c3 -| p5)  {};
+%     \node [coord] (c5) at (c2 -| ct)  {};
+%        
+%     % 判断框连线，每次绘制时，先绘制一个带有一个固定
+%     % 位置标注的路径(path)，然后再绘制箭头本身(arrow)。
+%     \path (t1.south) -- node [near start, right] {$N$} (p2.north);
+%     \draw [norm] (t1.south) -- (p2.north);
+%     \path (t1.west) -| node [near start, above] {$Y$} (p4.north);
+%     \draw [norm] (t1.west) -| (p4.north);
+%      
+%     \path (t2.south) -- node [near start, right] {$Y$} (t3.north);
+%     \draw [norm] (t2.south) -- (t3.north);
+%     \path (t2.east) -| node [near start, above] {$N$} (p6.north);
+%     \draw [norm] (t2.east) -| (p6.north);
+%        
+%     \path (t3.south) -- node [near start, right] {$N$} (p3.north);
+%     \draw [norm] (t3.south) -- (p3.north);
+%     \path (t3.east) -| node [near start, above] {$Y$} (p5.north);
+%     \draw [norm] (t3.east) -| (p5.north);
+%  
+%     % 其它连线
+%     \draw [norm](p3.south) |- (c5) |- (c1);
+%     \draw [norm](p4.south) |- (c3);
+%     \draw [norm](p4.south) |- (c3) -- (end);
+%     \draw [norm](p5.south) -- (c4);
+%     \draw [norm](p6.south) |- (c3);
+%     \draw [norm](p6.south) |- (c3) -- (end);
+%   \end{tikzpicture}
+%   \caption{素数判定流程图}
+%   \label{fig:colorflowchart}
+% \end{figure}
+% \end{verbatim}
+%
+% \flowchartset{
+%   proc fill color = orange!10,
+%   test fill color = green!30,
+%   io fill color = blue!30,
+%   term fill color = red!30,
+%   proc text width = 6em,
+%   test text width = 10em,
+% }
+%   
+% \begin{figure}[!htp]
+%   \centering
+%   \begin{tikzpicture}[scale=0.5]
+%     % 布置结点单元
+%     \node [term] (st) {开始};
+%     \node [proc, join] (p1) {\verb|int divisor|};       
+%     \node [test, join] (t1) {\verb|n <= 1|};
+%     \node [proc] (p2) {\verb|divisor = 2|};
+%     \node [test, join] (t2) {\verb|divisor * divisor <= n|};
+%     \node [test] (t3) {\verb|n % divisor == 0|};
+%     \node [proc] (p3) {\verb|divisor++|};
+%     \node [term, below = 1.6 of p3] (end) {结束};
+%     \node [proc, left = 4.8 of t2] (p4) {\verb|return 0|};
+%     \node [proc, right = 3.5 of p3] (p5) {\verb|return 0|};
+%     \node [proc, right = 5.8 of t3] (p6) {\verb|return 1|};
+%
+%     % 布置用于连接的坐标结点，同时为其布置调试标记点。
+%     \node [coord] (c1) at ($(p2.south)!0.5!(t2.north)$)  {};
+%     \node [coord, below = 0.25 of p3] (c2)  {};
+%     \node [coord, above = 0.5 of end] (c3) {};
+%     \node [coord, left = 0.5 of t2] (ct) {};
+%     \node [coord] (c4) at (c3 -| p5)  {};
+%     \node [coord] (c5) at (c2 -| ct)  {};
+%        
+%     % 判断框连线，每次绘制时，先绘制一个带有一个固定
+%     % 位置标注的路径(path)，然后再绘制箭头本身(arrow)。
+%     \path (t1.south) -- node [near start, right] {$N$} (p2.north);
+%     \draw [norm] (t1.south) -- (p2.north);
+%     \path (t1.west) -| node [near start, above] {$Y$} (p4.north);
+%     \draw [norm] (t1.west) -| (p4.north);
+%      
+%     \path (t2.south) -- node [near start, right] {$Y$} (t3.north);
+%     \draw [norm] (t2.south) -- (t3.north);
+%     \path (t2.east) -| node [near start, above] {$N$} (p6.north);
+%     \draw [norm] (t2.east) -| (p6.north);
+%        
+%     \path (t3.south) -- node [near start, right] {$N$} (p3.north);
+%     \draw [norm] (t3.south) -- (p3.north);
+%     \path (t3.east) -| node [near start, above] {$Y$} (p5.north);
+%     \draw [norm] (t3.east) -| (p5.north);
+%
+%     % 其它连线
+%     \draw [norm](p3.south) |- (c5) |- (c1);
+%     \draw [norm](p4.south) |- (c3);
+%     \draw [norm](p4.south) |- (c3) -- (end);
+%     \draw [norm](p5.south) -- (c4);
+%     \draw [norm](p6.south) |- (c3);
+%     \draw [norm](p6.south) |- (c3) -- (end);
+%   \end{tikzpicture}
+%   \caption{for循环流程图}
+%   \label{fig:colorflowchart}
+% \end{figure}
+%
+% \subsection{使用\tkz{}命令和参数}
+% 所有合法的\tkz{}命令和参数都可以应用于|tikzpicture|绘图环境中。
 %
 % \section{代码实现}
 % 该宏包仅需要载入|tikz|和|xifthen|宏包，如果这些宏包没有载入，则自
