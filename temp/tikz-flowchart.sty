@@ -25,13 +25,22 @@
   [2019/08/20 v1.0.01 draw flowchart using TikZ]
 \RequirePackage{tikz}
 \RequirePackage{xifthen}
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{
+  family=flowchart,
+  prefix=flowchart@,
+  setkeys=\kvsetkeys
+}
+\DeclareBoolOption[false]{debug}
+\DeclareDefaultOption{}
+\kvsetkeys{flowchart}{}
+\ProcessKeyvalOptions*
+
 \usetikzlibrary{
-  arrows.meta,
-  calc,
-  positioning,
-  decorations,
-  decorations.markings,
-  math,
+  arrows.meta,      % 箭头形状
+  shapes.geometric, % 几何形状
+  chains,           % 链式布局
+  calc,             % 坐标计算
 }
 \pgfkeys{
   /flowchart/.is family,
@@ -40,157 +49,187 @@
 
 \def\flowchartset{\pgfqkeys{/flowchart}}
 \flowchartset{
-  coarse grid color/.store in = \maingridcolor,
-  fine grid color/.store in = \finegridcolor,
-}
-
-\flowchartset{
-  image label font/.store in = \imagelabelfont,
-  image label distance/.store in = \flowchartep,
-  image label back/.store in = \imagelabelback,
-  image label text/.store in = \imagelabeltext,
-}
-
-\flowchartset{
-  coordinate label font/.store in = \coordinatelabelfont,
-  coordinate label distance/.store in = \coordinatelabelsep,
-  coordinate label back/.store in = \coordinatelabelback,
-  coordinate label text/.store in = \coordinatelabeltext,
-}
-
-\flowchartset{
-  annotation font/.store in = \annotationfont,
-  arrow distance/.store in = \arrowdistance,
-  arrow thickness/.store in = \arrowthickness,
-  tip size/.store in = \tipsize,
-  border thickness/.store in = \borderthickness,
-  outer dist/.store in = \labeloutersep,
+  free color/.store in = \freecolor, % 自由连线颜色
+  norm color/.store in = \normcolor, % 常规连线颜色
+  cong color/.store in = \congcolor, % 关联连线颜色
+  proc fill color/.store in = \procfillcolor, % 顺序处理框填充颜色
+  test fill color/.store in = \testfillcolor, % 判断框填充颜色
+  io fill color/.store in = \iofillcolor, % 输入/输出框填充颜色
+  term fill color/.store in = \termfillcolor, % 开始/结束框填充颜色
+  proc text width/.store in = \proctxtwd, % 顺序处理框宽度
+  test text width/.store in = \testtxtwd, % 判断框宽度
+  io text width/.store in = \iotxtwd, % 输入/输出框宽度
+  term text width/.store in = \termtxtwd, % 开始/结束宽度
+  chain direction/.store in = \chaindir, % 结点自动布置方向
+  minimum node distance/.store in = \minnodedis, % 最小结点间距
+  maximum node distance/.store in = \maxnodedis, % 最大结点间距
+  border line width/.store in = \bdlinewd, % 各类流程框边框宽度
+  flow line width/.store in = \flowlinewd, % 各类流程线线条宽度
+  stealth length/.store in = \stealthlen, % 箭头长度
+  stealth width/.store in = \stealthwd, % 箭头宽度
 }
 \flowchartset{
-  coarse grid color = red,
-  fine grid color = gray,
-  image label font = \sffamily\bfseries\small,
-  image label distance = 2mm,
-  image label back = black,
-  image label text = white,
-  coordinate label font = \sffamily\bfseries\scriptsize,
-  coordinate label distance = 2mm,
-  coordinate label back = black,
-  coordinate label text = white,
-  annotation font = \normalfont\small,
-  arrow distance = 1.5mm,
-  border thickness = 0.6pt,
-  arrow thickness = 0.4pt,
-  tip size = 1.2mm,
-  outer dist = 0.5cm,
+  free color = green, % 自由连线颜色(默认取green)
+  norm color = blue, % 常规连线颜色(默认取blue)
+  cong color = red, % 关联连线颜色(默认取red)
+  proc fill color = white, % 顺序处理框填充颜色(默认取白色)
+  test fill color = white, % 判断框填充颜色(默认取白色)
+  io fill color = white, % 输入/输出框填充颜色(默认取白色)
+  term fill color = white, % 开始/结束框填充颜色(默认取白色)
+  proc text width = 8em, % 顺序处理框宽度(默认取8em)
+  test text width = 5em, % 判断框宽度(默认取5em)
+  io text width = 6em, % 输入/输出框宽度(默认取6em)
+  term text width = 3em, % 开始/结束宽度(默认取3em)
+  chain direction = below, % 结点自动布置方向(默认取below)
+  minimum node distance = 6mm, % 最小结点间距(默认取6mm)
+  maximum node distance = 60mm, % 最大结点间距(默认取60mm)
+  border line width = \pgflinewidth, % 各类流程框边框宽度(默认取当前线条宽度)
+  flow line width = \pgflinewidth, % 各类流程线线条宽度(默认取当前线条宽度)
+  stealth length = 1.5mm, % 箭头长度(默认取1.5mm)
+  stealth width = 1.0mm, % 箭头宽度(默认取1.0mm)
 }
-\newenvironment{annotationimage}[3][]{
-\let\tikzset\flowchartset
-  \begin{tikzpicture}
-  \node[anchor=south west, inner sep=0]
-    (image) at (0,0) {\includegraphics[#2]{#3}};
-  \begin{scope}[x={(image.south east)},y={(image.north west)}]
-  \ifthenelse{\equal{#1}{grid}}{%
-    \draw[very thin, draw=\finegridcolor, step=0.02]
-      (0,0) grid (1,1);
-    \draw[thin, draw=\maingridcolor, xstep=0.1, ystep=0.1]
-      (0,0) grid (1,1);
-    \foreach \x in {0,1,...,9} {
-      \node [anchor=north] at (\x/10,0) {\tiny 0.\x};
+\tikzset{
+  start chain = going \chaindir,    % 结点自动布置方向(默认取below)
+  node distance = \minnodedis and \maxnodedis, % 结点间距
+  every join/.style = {norm},   % 默认自动连接线的连线样式
+  % 流程框样式的基础样式
+  base/.style = {line width = \bdlinewd, % 边框线宽
+                 draw,                   % 绘制边框
+                 on chain,               % 沿布局方向绘制
+                 on grid,                % 沿网格布局
+                 align=center,           % 内容居中对齐
+                 minimum height=2ex,      % 流程框最小高度
+                },
+  % 顺序处理框样式
+  proc/.style={base,           % 基础样式
+               rectangle,      % 矩形边框
+               text width=\proctxtwd, % 最大文本宽度(超过会自动换行)
+               fill=\procfillcolor, % 填充色
+              },
+  % 判断框样式
+  test/.style={base,           % 基础样式
+               diamond,        % 菱形边框
+               aspect=2.5,       % 长高比例
+               text width=\testtxtwd, % 最大文本宽度(超过会自动换行)
+               fill=\testfillcolor, % 填充色
+              },
+  % 输入/输出框样式
+  io/.style={base,                      % 基础样式
+             trapezium,                 % 平行四边形
+             trapezium left angle=70,   % 平行四边形左倾角
+             trapezium right angle=110, % 平行四边形右倾角
+             text width=\iotxtwd,            % 最大文本宽度(超过会自动换行)
+             fill=\iofillcolor, % 填充色
+            },
+  % 开始/结束框样式
+  term/.style={proc,            % 基于proc样式
+               rounded corners=2.0mm, % 为矩形添加圆角属性
+               text width=\termtxtwd, % 最大文本宽度(超过会自动换行)
+               fill=\termfillcolor, % 填充色
+              },
+  % 流程连接点样式
+  connector/.style = {draw,              % 绘制边框
+                      circle,            % 圆形
+                      node distance=3cm, % 节点间距
+                     },
+  % 绕接连线点样式(不相交的两个交汇路径)
+  connect/.style args={(#1) to (#2) over (#3) by #4}{
+    insert path={
+      let \p1=($(#1)-(#3)$), \n1={veclen(\x1,\y1)},
+        \n2={atan2(\y1,\x1)}, \n3={abs(#4)}, \n4={#4>0 ?-180:180}  in
+        (#1) -- ($(#1)!\n1-\n3!(#3)$) arc (\n2:\n2+\n4:\n3) -- (#2)
     }
-    \node [anchor=north] at (1,0) {\tiny 1};
-
-    \foreach \y in {0,1,...,9} {
-      \node [anchor=east] at (0,\y/10) {\tiny 0.\y};
-    }
-    \node [anchor=east] at (0,1) {\tiny 1};
-  }{}
+  },
+  % coord结点样式(用于布置流程线连接点)
+  coord/.style={coordinate,                 % 笛卡尔坐标系
+                %on chain,                   % 沿布局方向绘制
+                %on grid,                    % 沿网格布局
+                node distance=6mm and 25mm, % 节点间距
+               },
+  % nmark结点样式(用于布置调试坐标标记点)
+  nmark/.style={draw,                           % 绘制边框
+                cyan,                           % 青色
+                circle,                         % 圆形
+                font={\sffamily\bfseries}, % 字体
+               },
+  % -------------------------------------------------
+  % 无箭头连线样式
+  lnorm/.style={line width = \flowlinewd,  % 线宽
+                draw,                      % 绘制
+                \normcolor,                % 颜色
+               },
+  lfree/.style={line width = \flowlinewd,
+                draw,
+                \freecolor,
+               },
+  lcong/.style={line width = \flowlinewd,
+                draw,
+                \congcolor,
+               },
+  % 流程线实心交点样式
+  dotnorm/.style={draw,              % 绘制
+                  fill = \normcolor, % 填充颜色
+                  \normcolor,        % 颜色
+                 },
+  dotfree/.style={draw,
+                  fill = \freecolor,
+                  \freecolor,
+                 },
+  dotcong/.style={draw,
+                  fill = \congcolor,
+                  \congcolor,
+                 },
+  % 流程线空心交点样式
+  cdotnorm/.style={draw,       % 绘制
+                   \normcolor, % 颜色
+                  },
+  cdotfree/.style={draw,
+                   \freecolor,
+                  },
+  cdotcong/.style={draw,
+                   \congcolor,
+                  },
+  % 带箭头连线样式
+  norm/.style={line width = \flowlinewd,     % 线宽
+               -{Stealth[length=\stealthlen, % 箭头长度
+                         width=\stealthwd,   % 箭头宽度
+                        ]
+                },
+               draw,                        % 绘制
+               \normcolor,                  % 颜色
+              },
+  free/.style={line width = \flowlinewd,
+               -{Stealth[length=\stealthlen,
+                         width=\stealthwd,
+                        ]
+                },
+               draw,
+               \freecolor,
+              },
+  cong/.style={line width = \flowlinewd,
+               -{Stealth[length=\stealthlen,
+                         width=\stealthwd,
+                        ]
+                },
+               draw,
+               \congcolor,
+              },
+  % 斜体字样式
+  it/.style={font={\small\itshape}},
 }
-{
- \end{scope}
- \end{tikzpicture}}
-\flowchartset{
-  annotation arrow/.style =
-  {
-    preaction =
-    {
-      draw,
-      -{Circle[fill=white, length=\tipsize+2*\borderthickness,
-        width=\tipsize+2*\borderthickness]},
-      line width = 2*\borderthickness + \arrowthickness,
-      white,
-      shorten >= \arrowdistance,
-    },
-    draw,
-    -{Circle[fill=black, length=\tipsize, width=\tipsize]},
-    black,
-    line width = \arrowthickness,
-    shorten >= \borderthickness + \arrowdistance,
-  },
-  annotation node/.style =
-  {
-    font=\annotationfont,
-    inner sep = 0.5ex,
-  },
-  annotation below/.style args = {#1 at #2}{
-    annotation arrow,
-    insert path = {
-      (#2,0) ++ (0,-\labeloutersep)
-        node[anchor = north, annotation node] {#1\strut}
-    }
-  },
-  annotation above/.style args = {#1 at #2}{
-    annotation arrow,
-    insert path = {
-      (#2,1.0) ++ (0,\labeloutersep)
-        node[anchor = south, annotation node] {#1\strut}
-    }
-  },
-  annotation left/.style args = {#1 at #2}{
-    annotation arrow,
-    insert path = {
-      (0,#2) ++ (-\labeloutersep,0)
-        node[anchor = east, annotation node] {#1}
-    }
-  },
-  annotation right/.style args = {#1 at #2}{
-    annotation arrow,
-    insert path = {
-      (1.0,#2) ++ (\labeloutersep,0)
-        node[anchor = west, annotation node] {#1}
-    }
-  },
-}
-\flowchartset{
-  image label style/.style = {
-    rectangle,
-    minimum width = 5mm,
-    minimum height = 5mm,
-    fill = \imagelabelback,
-    text = \imagelabeltext,
-    font = \imagelabelfont,
-  },
-  coordinate label style/.style = {
-    rectangle,
-    minimum width = 3mm,
-    minimum height = 3mm,
-    fill = \coordinatelabelback,
-    text = \coordinatelabeltext,
-    font = \coordinatelabelfont,
-  },
-  image label/.style args = {#1 at #2}{
-    insert path = {
-      (image.#2) node[outer sep = \flowchartep,
-        anchor=#2, image label style] {#1}
-    }
-  },
-  coordinate label/.style args = {#1 at (#2)}{
-    insert path = {
-      node[outer sep = \coordinatelabelsep,
-        anchor=center, coordinate label style] at (#2) {#1}
-    }
-  },
-}
+%% 判断是否为宏包传入了debug参数以打开调试功能，若没有传入debug参数，则关闭调试功能。
+\ifflowchart@debug
+  % 设置一个用于调试的标记符号图层，注意确保这一图层位于顶层
+  \pgfdeclarelayer{marx}
+  \pgfsetlayers{main,marx}
+  \newcommand{\cmark}[2][]{%
+  \begin{pgfonlayer}{marx}
+    \node [nmark] at (c#2#1) {#2};
+  \end{pgfonlayer}{marx}
+  }
+\else
+  \newcommand{\cmark}[2][]{\relax}
+\fi
 \endinput
 %%
 %% End of file `tikz-flowchart.sty'.
