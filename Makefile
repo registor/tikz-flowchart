@@ -1,42 +1,17 @@
-# 该 Makefile 用于编译一个 Beamer 制作的幻灯片
-# 运行环境：Linux、texlive2014(XeTeX)、evince 阅读器
+SUBDIRS := $(sort $(dir $(wildcard samples/*/*)))
+NAME = tikz-flowchart
 
-Compiler = xelatex -shell-escape -interaction=nonstopmode
-Reader = evince
+.PHONY: all $(SUBDIRS) clean
 
-Target = main.pdf
-Source = main.tex
-TmpFile = *.out *.log *.aux *.nav *.snm *.toc *.vrb *.pyg *.nav *.toc
+all: $(SUBDIRS)
+	xelatex $(NAME).ins
+	xelatex --shell-escape --interaction=nonstopmode $(NAME).dtx
+	xelatex --shell-escape --interaction=nonstopmode $(NAME).dtx
+	makeindex -s gglo.ist -o $(NAME).gls $(NAME).glo
+	xelatex --shell-escape --interaction=nonstopmode $(NAME).dtx
+	xelatex --shell-escape --interaction=nonstopmode $(NAME).dtx
 
-$(Target): $(Source)
-	$(Compiler) $(Source)
-	$(Compiler) $(Source)
+$(SUBDIRS):  ; $(MAKE) -C $@ $(MAKECMDGOALS)
 
-all: $(Target) clean read 
-
-read:
-	$(Reader) $(Target)
-
-clean:
-#	-rm -r $(TmpFile)
-	find . -name "*.out"  | xargs rm -f
-	find . -name "*.log"  | xargs rm -f
-	find . -name "*.aux"  | xargs rm -f
-	find . -name "*.nav"  | xargs rm -f
-	find . -name "*.snm"  | xargs rm -f
-	find . -name "*.toc"  | xargs rm -f
-	find . -name "*.vrb"  | xargs rm -f
-	find . -name "*.pyg"  | xargs rm -f
-	find . -name "*.nav"  | xargs rm -f
-	find . -name "*.toc"  | xargs rm -f
-	find . -name "*.atfi"  | xargs rm -f
-	find . -name "*.bbl"  | xargs rm -f
-	find . -name "*.bcf"  | xargs rm -f
-	find . -name "*.blg"  | xargs rm -f
-	find . -name "*.xml"  | xargs rm -f
-	find . -name "main-blx.bib"  | xargs rm -f
-	find . -name "*.*~"  | xargs rm -f
-cleanall:
-	-rm -r $(TmpFile) $(Target)
-
-.PHONY: all read clean cleanall
+clean: $(SUBDIRS)
+	--@rm -rf *.aux *.glo *.gls *.ilg *.log *.out *.toc

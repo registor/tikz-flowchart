@@ -1,11 +1,14 @@
 %%
-%% `tikz-flowchart.sty'文件用于绘制传统流程图
-%% 作者：西北农林科技大学信息工程学院耿楠
+%% This is file `tikz-flowchart.sty',
+%% generated with the docstrip utility.
 %%
-%% 原代码作者: Brent Longborough
-%% URL：http://www.texample.net/tikz/examples/author/brent-longborough/
+%% The original source files were:
+%%
+%% tikz-flowchart.dtx  (with options: `package')
 %% 
-%% Copyright (C) 2019 by Tobias Plüss <tpluess@ieee.org>
+%% This is a generated file.
+%% 
+%% Copyright (C) 2019 by Geng Nan <nangeng@nwsuaf.edu.cn>
 %% 
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3
@@ -18,39 +21,35 @@
 %% version 2005/12/01 or later.
 %% 
 \NeedsTeXFormat{LaTeX2e}[2011/06/27]
-\ProvidesPackage{tikz-flowchart}[2019/08/17 v1.0.00 draw flowchart using TikZ]
+\ProvidesPackage{tikz-flowchart}
+  [2019/08/20 v1.0.01 draw flowchart using TikZ]
+
+
 \RequirePackage{tikz}
 \RequirePackage{xifthen}
-
-% 处理宏包参数
 \RequirePackage{kvoptions}
 \SetupKeyvalOptions{
   family=flowchart,
   prefix=flowchart@,
   setkeys=\kvsetkeys
 }
-
-% 设置debug布尔类型的宏包参数
 \DeclareBoolOption[false]{debug}
 \DeclareDefaultOption{}
 \kvsetkeys{flowchart}{}
 \ProcessKeyvalOptions*
 
-% 载入需要的tikz库
 \usetikzlibrary{
-  arrows.meta,
-  shapes.geometric,
-  chains,
-  calc,
+  arrows.meta,      % 箭头形状
+  shapes.geometric, % 几何形状
+  chains,           % 链式布局
+  calc,             % 坐标计算
 }
-
-% 设置参数设置命令
 \pgfkeys{
   /flowchart/.is family,
   /flowchart/.search also={/tikz},
 }
+
 \def\flowchartset{\pgfqkeys{/flowchart}}
-% 定义参数及代表该参数的宏名称
 \flowchartset{
   free color/.store in = \freecolor, % 自由连线颜色
   norm color/.store in = \normcolor, % 常规连线颜色
@@ -71,7 +70,6 @@
   stealth length/.store in = \stealthlen, % 箭头长度
   stealth width/.store in = \stealthwd, % 箭头宽度
 }
-% 各参数默认值
 \flowchartset{
   free color = green, % 自由连线颜色(默认取green)
   norm color = blue, % 常规连线颜色(默认取blue)
@@ -92,8 +90,6 @@
   stealth length = 1.5mm, % 箭头长度(默认取1.5mm)
   stealth width = 1.0mm, % 箭头宽度(默认取1.0mm)
 }
-
-% 定义流程图绘图样式
 \tikzset{
   start chain = going \chaindir,    % 结点自动布置方向(默认取below)
   node distance = \minnodedis and \maxnodedis, % 结点间距
@@ -107,7 +103,7 @@
                  minimum height=2ex,      % 流程框最小高度
                 },
   % 顺序处理框样式
-  proc/.style={base,           % 基础样式  
+  proc/.style={base,           % 基础样式
                rectangle,      % 矩形边框
                text width=\proctxtwd, % 最大文本宽度(超过会自动换行)
                fill=\procfillcolor, % 填充色
@@ -130,7 +126,7 @@
   % 开始/结束框样式
   term/.style={proc,            % 基于proc样式
                rounded corners=2.0mm, % 为矩形添加圆角属性
-               text width=\termtxtwd, % 最大文本宽度(超过会自动换行) 
+               text width=\termtxtwd, % 最大文本宽度(超过会自动换行)
                fill=\termfillcolor, % 填充色
               },
   % 流程连接点样式
@@ -138,6 +134,14 @@
                       circle,            % 圆形
                       node distance=3cm, % 节点间距
                      },
+  % 绕接连线点样式(不相交的两个交汇路径)
+  connect/.style args={(#1) to (#2) over (#3) by #4}{
+    insert path={
+      let \p1=($(#1)-(#3)$), \n1={veclen(\x1,\y1)},
+        \n2={atan2(\y1,\x1)}, \n3={abs(#4)}, \n4={#4>0 ?-180:180}  in
+        (#1) -- ($(#1)!\n1-\n3!(#3)$) arc (\n2:\n2+\n4:\n3) -- (#2)
+    }
+  },
   % coord结点样式(用于布置流程线连接点)
   coord/.style={coordinate,                 % 笛卡尔坐标系
                 %on chain,                   % 沿布局方向绘制
@@ -150,26 +154,18 @@
                 circle,                         % 圆形
                 font={\sffamily\bfseries}, % 字体
                },
-  % 绕接连线样式(不相交的两个交汇路径)
-  connect/.style args={(#1) to (#2) over (#3) by #4}{
-    insert path={
-      let \p1=($(#1)-(#3)$), \n1={veclen(\x1,\y1)}, 
-        \n2={atan2(\y1,\x1)}, \n3={abs(#4)}, \n4={#4>0 ?-180:180}  in 
-        (#1) -- ($(#1)!\n1-\n3!(#3)$) arc (\n2:\n2+\n4:\n3) -- (#2)
-    }
-  }, 
   % -------------------------------------------------
   % 无箭头连线样式
   lnorm/.style={line width = \flowlinewd,  % 线宽
                 draw,                      % 绘制
                 \normcolor,                % 颜色
                },
-  lfree/.style={line width = \flowlinewd, 
-                draw, 
+  lfree/.style={line width = \flowlinewd,
+                draw,
                 \freecolor,
                },
-  lcong/.style={line width = \flowlinewd, 
-                draw, 
+  lcong/.style={line width = \flowlinewd,
+                draw,
                 \congcolor,
                },
   % 流程线实心交点样式
@@ -177,22 +173,22 @@
                   fill = \normcolor, % 填充颜色
                   \normcolor,        % 颜色
                  },
-  dotfree/.style={draw, 
-                  fill = \freecolor, 
+  dotfree/.style={draw,
+                  fill = \freecolor,
                   \freecolor,
                  },
-  dotcong/.style={draw, 
-                  fill = \congcolor, 
+  dotcong/.style={draw,
+                  fill = \congcolor,
                   \congcolor,
                  },
   % 流程线空心交点样式
-  cdotnorm/.style={draw,       % 绘制 
+  cdotnorm/.style={draw,       % 绘制
                    \normcolor, % 颜色
                   },
-  cdotfree/.style={draw, 
+  cdotfree/.style={draw,
                    \freecolor,
                   },
-  cdotcong/.style={draw, 
+  cdotcong/.style={draw,
                    \congcolor,
                   },
   % 带箭头连线样式
@@ -200,32 +196,30 @@
                -{Stealth[length=\stealthlen, % 箭头长度
                          width=\stealthwd,   % 箭头宽度
                         ]
-                }, 
-               draw,                        % 绘制 
+                },
+               draw,                        % 绘制
                \normcolor,                  % 颜色
               },
-  free/.style={line width = \flowlinewd, 
-               -{Stealth[length=\stealthlen, 
+  free/.style={line width = \flowlinewd,
+               -{Stealth[length=\stealthlen,
                          width=\stealthwd,
                         ]
                 },
-               draw, 
+               draw,
                \freecolor,
               },
-  cong/.style={line width = \flowlinewd, 
-               -{Stealth[length=\stealthlen, 
+  cong/.style={line width = \flowlinewd,
+               -{Stealth[length=\stealthlen,
                          width=\stealthwd,
                         ]
-                }, 
-               draw, 
+                },
+               draw,
                \congcolor,
               },
   % 斜体字样式
   it/.style={font={\small\itshape}},
 }
-
-% 标记坐标点的宏命令(指定使用的坐标名称)
-% 可以通过给宏包传入debug参数以打开调试功能，若没有传入debug参数，则关闭调试功能。
+%% 判断是否为宏包传入了debug参数以打开调试功能，若没有传入debug参数，则关闭调试功能。
 \ifflowchart@debug
   % 设置一个用于调试的标记符号图层，注意确保这一图层位于顶层
   \pgfdeclarelayer{marx}
@@ -234,11 +228,10 @@
   \begin{pgfonlayer}{marx}
     \node [nmark] at (c#2#1) {#2};
   \end{pgfonlayer}{marx}
-  } 
+  }
 \else
   \newcommand{\cmark}[2][]{\relax}
 \fi
-
 \endinput
 %%
 %% End of file `tikz-flowchart.sty'.

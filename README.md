@@ -8,6 +8,13 @@ Happy LaTeXing！~
 ![](./screenshot/flowchart01.png)
 ![](./screenshot/flowchart02.png)
 
+更多示例，可以参考`demo.tex`文件。
+
+## 编译宏包及宏包说明
+如果没有`tikz-flowchart.sty`宏包文件，则可以在命令行通过运行`make`命令生成：
+* `tikz-flowchart.sty`宏包文件。
+* `tikz-flowchart.pdf`宏包说明文件。
+
 ## 使用方法
 1. `\flowchartset`命令
 `\flowchartset`命令用于设置绘制参数，详细说明如下：
