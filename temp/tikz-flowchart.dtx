@@ -171,7 +171,7 @@
 % 载入宏包。如果带有\oarg{debug}参数，则可以绘制用于调试的流程线转角点
 % 标记，否则，则不绘制该标记，\autoref{fig:forloopcmark}是带有
 % \oarg{debug}参数时的绘制结果。
-
+%
 % \begin{figure}[!htp]
 %   \centering
 %   \begin{tikzpicture}
@@ -201,7 +201,7 @@
 %   \label{fig:forloopcmark}
 % \end{figure}
 %
-% \subsection{流程图样式}
+% \subsection{流程图绘制样式}
 % \thispkg{}宏包定义了在\tkz{}中绘制流程图的绘图样式，以简化绘图过程。
 %
 % \begin{description}
@@ -219,6 +219,12 @@
 %   图链接点的样式，如：\tikz{\node[connector]{1}}
 %   \ItemDescribeArgument[\cmd{node}]{coord}\cmd{node}命令布置转角结点
 %   的样式，如：\tikz{\node[coord](c1){};\cmark{1}}
+%   \ItemDescribeArgument[\cmd{draw}]{connect}\cmd{draw}命令绘制不相交
+%   的两个交汇路径的样式，如：\tikz{\node[coord](c1)at(0,0){};
+%   \node[coord](c2)at(0.3,0){};\node[coord](c3)at(0.15,-0.15){};
+%   \node[coord](c4)at(0.15,0.15){};\node[coord] (c5) at (c4 |- c1)
+%   {};\draw[lnorm](c3)--(c4);
+%   \draw[lnorm, connect=(c1) to (c2) over (c5) by 1.5pt] -- (c2);}
 %   \ItemDescribeArgument[\cmd{draw}]{lnorm}\cmd{draw}命令绘制指定颜色
 %   无箭头连线的样式，如：\tikz{\draw[lnorm](0,0)--(0.5,0)}
 %   \ItemDescribeArgument[\cmd{draw}]{lfree}\cmd{draw}命令绘制指定颜色
@@ -242,63 +248,13 @@
 %   \ItemDescribeArgument[\cmd{draw}]{cdotcong}\cmd{draw}命令绘制指定颜
 %   色流程线空心交点的样式，如：\tikz{\draw[cdotcong](0,0) circle(1.5pt)}
 % \end{description}
-% \section{绘制流程图}
-% \subsection{布置结点}
-% 使用类似``\verb|\node [proc](p1){表达式1};|''\tkz{} 绘图命令，采用\pkg{}
-% 定义的``\verb|proc|''、``\verb|test|''、``\verb|io|''或
-% ``\verb|term|''的\enquote{node样式}参数布置需要的流程框结点。
 %
-% 在布置结点时，如果前一个结点不是``\verb|test|''样式，则可以使用
-% ``\verb|join|''参数自动与前一个结点建立连接，如
-% ``\verb|\node [proc, join] (p3) {表达式3};|''，同时绘制对应流程线。
+% \subsection{样式参数设置命令}
+% \DescribeMacro{flowchartset}
+% \thispkg{}宏包定义了\cmd{flowchartset}命令，该命令用于设置流程图各元
+% 素的的绘图属性，详情见如下代码注释。
 %
-% 另外，可以根据需要同时对布置的结点进行命名(如``\verb|p1|''、
-% ``\verb|t1|''等)，以便后续对该结点进行引用。
-%
-% \subsection{布置坐标点}
-% 使用类似``\verb|\node [coord, above = 0.5 of p1] (c1)  {}; \cmark{1}|''
-% \tkz{} 绘图命令，采用\pkg{}
-% 定义的``\verb|coord|''的样式参数布置其它需要的坐标点
-% (用于流程线的转接)。同时，也可以使用``\verb|cmark|''命令为该点作出标
-% 记，以方便调试流程线连线。该标记在使用``\verb|debug|''可选参数引入
-% ``\verb|\usepackage[debug]{tikz-flowchart}|''宏包时，将绘制这些标记
-% 点，若引入宏包时无``\verb|debug|''可选参数，则不绘制该标记点。
-%
-% \subsection{绘制流程线}
-% 首先使用类似``\verb|\path(t1.south)--node[near start,right]{$Y$}(p2.north);|''
-% 的路径命令绘制流程线标注。
-%
-% 然后使用类似``\verb!\draw[norm](t1.east)--(c6)|-(c4)--(c5);!''
-% 绘制命令绘制带有箭头的流程线。
-%
-% \subsection{绘制流程线}
-% 首先使用类似``\verb|\path(t1.south)--node[near start,right]{$Y$}(p2.north);|''
-% 的路径命令绘制流程线标注。
-%
-% 然后使用类似``\verb!\draw[norm](t1.east)--(c6)|-(c4)--(c5);!''
-% 绘制命令绘制带有箭头的流程线。
-%
-% 在绘制流程线时，可以使用``\verb|lnorm|''、``\verb|lfree|''或
-% ``\verb|lcong|''指定颜色的样式绘制无箭头的流程线，用``\verb|norm|''、
-% ``\verb|free|''或``\verb|cong|''指定颜色的样式绘制有箭头的流程线。
-%
-% 建立先绘制南北方向流程线，再绘制东西方向流程线。
-%
-% 在绘制流程线时，可以使用``\verb|dotnorm|''、``\verb|dotfree|''和
-% ``\verb|dotcong|''样式绘制流程线实心交点，用``\verb|cdotnorm|''、
-% ``\verb|cdotfree|''或``\verb|cdotcong|''样式绘制流程线空心交点。
-%
-% 对于不相交的流程线，可以用``\verb|connect|''样式进行绘制。
-%
-% \subsection{其它命令}
-% 可以使用任何合法的\tkz{}命令为流程图绘制需要的图形。
-%
-% \section{参数设置}
-%
-% \subsection{全局设置}
-% 可以在导言区使用\verb|\flowchartset{}|命令设置需要的绘图全局设置。
-%
-% \begin{verbatim}
+% \begin{sourceverb}[xleftmargin=0em]
 % \flowchartset{
 %   free color = green,                % 自由连线颜色(默认取green)
 %   norm color = blue,                 % 常规连线颜色(默认取blue)
@@ -319,16 +275,75 @@
 %   stealth length = 1.5mm,            % 箭头长度(默认取1.5mm)
 %   stealth width = 1.0mm,             % 箭头宽度(默认取1.0mm)
 % }
-% \end{verbatim}
+% \end{sourceverb}
+%
+% 这些参数设置方式与常规的\tkz{}参数设置类似，即可以多个参数一起设置，
+% 也可以分开单独设置。\cmd{flowchartset}命令可以在导言区进行全局设置，
+% 也可以在需要的位置进行局部设置。
+% \section{流程图绘制步骤}
+% \subsection{布置结点}
+% 使用类似``|\node [proc](p1){表达式1};|''\tkz{} 绘图命令，采用\thispkg{}
+% 定义的``|proc|''、``|test|''、``|io|''或``|term|''的
+% \enquote{\cmd{node}}样式参数布置需要的流程框结点。
+%
+%
+% 在布置结点时，如果前一个结点不是``|test|''样式，则可以使用
+% ``|join|''参数自动与前一个结点建立连接，如
+% ``|\node [proc, join] (p3) {表达式3};|''，同时绘制对应流程线。
+%
+% 另外，可以根据需要同时对布置的结点进行命名(如``|p1|''、
+% ``|t1|''等)，以便后续对该结点进行引用。
+%
+% \subsection{布置坐标点}
+% 使用类似``|\node [coord, above = 0.5 of p1] (c1)  {}; \cmark{1}|''
+% \tkz{} 绘图命令，采用\thispkg{}
+% 定义的``|coord|''的样式参数布置其它需要的坐标点
+% (用于流程线的转接)。同时，也可以使用``|cmark|''命令为该点作出标
+% 记，以方便调试流程线连线。该标记在使用
+% \cmd{usepackage}\oarg{debug}\marg{\thispkg{}}命令，带\oarg{debug}可选参数引入
+% 宏包时，将绘制这些标记点，若引入宏包时无\oarg{debug}可选参数时，则不绘制该标记点。
+%
+% \subsection{绘制流程线}
+% 首先使用类似``|\path(t1.south)--node[near start,right]{$Y$}(p2.north);|''
+% 的路径命令绘制流程线标注。
+%
+% 然后使用类似``\verb!\draw[norm](t1.east)--(c6)|-(c4)--(c5);!''
+% 绘制命令绘制带有箭头的流程线。
+%
+% 在绘制流程线时，可以使用``|lnorm|''、``|lfree|''或
+% ``|lcong|''指定颜色的样式绘制无箭头的流程线，用``|norm|''、
+% ``|free|''或``|cong|''指定颜色的样式绘制有箭头的流程线。
+%
+% 建立先绘制南北方向流程线，再绘制东西方向流程线。
+%
+% 在绘制流程线时，可以使用``|dotnorm|''、``|dotfree|''和
+% ``|dotcong|''样式绘制流程线实心交点，用``|cdotnorm|''、
+% ``|cdotfree|''或``|cdotcong|''样式绘制流程线空心交点。
+%
+% 对于不相交的流程线，可以用``|connect|''样式进行绘制。
+%
+% \subsection{绘制其它图形}
+% 在使用\cmd{node}、\cmd{path}、\cmd{draw}等命令时，除了可以使用
+% \thispkg{}宏包定义的样式外，也可以同时使用任何合法的\tkz{}绘图参数改
+% 变绘制属性。
+%
+% 同时，也可以使用任何合法的\tkz{}命令在流程图中绘制需要的图形元素。
+%
+% \section{流程图样例}
+%
+% \subsection{改变流程线颜色}
+% 可以在导言区使用\cmd{flowchartset}命令全局设置需要的绘图属性。
 %
 % 在进行参数设置时，可以仅指定需要的参数，如：
-% \begin{verbatim}
+% \begin{sourceverb}
+% \usepackage{tikz-flowchart}
 % \flowchartset{
-%   free color = green,                % 自由连线颜色(默认取green)
-%   norm color = black,                 % 常规连线颜色(默认取blue)
-%   cong color = red,                  % 关联连线颜色(默认取red)
+%   free color = green,  % 自由连线颜色(默认取green)
+%   norm color = black,  % 将常规连线颜色设置为black
+%   cong color = red,    % 关联连线颜色(默认取red)
 % }
-% \end{verbatim}
+% ......
+% \end{sourceverb}
 %
 % 可以指定``\verb|norm|''类型的颜色为``\verb|black|''，可以得到
 % \autoref{fig:forloopblack}所示的黑色流程线流程图。
@@ -341,7 +356,7 @@
 %   
 % \begin{figure}[!htp]
 %   \centering
-%   \begin{tikzpicture}[scale=0.85]
+%   \begin{tikzpicture}
 %     \node [proc] (p1) {表达式1};      
 %     \node [test, join] (t1) {表达式2?};
 %     \node [proc] (p2) {循环体};
@@ -364,9 +379,52 @@
 %     \draw [norm] (c1) -- (p1);
 %     \draw [norm] (p3.south) |- (c7) |- (c2);
 %   \end{tikzpicture}
-%   \caption{for循环流程图}
+%   \caption{黑色流程线流程图}
 %   \label{fig:forloopblack}
 % \end{figure}
+%
+% \subsection{改变流程框填充色}
+% 可以在导言区使用\cmd{flowchartset}命令全局设置需要的绘图属性。
+%
+% 在进行参数设置时，可以仅指定需要的参数，如：
+% \begin{fsourceverb}[label=局部设置绘图属性]
+% \flowchartset{
+%   proc fill color = orange!10,
+%   test fill color = green!30,
+%   io fill color = blue!30,
+%   term fill color = red!30,
+%   proc text width = 6em,
+%   test text width = 10em,
+% }
+% \begin{figure}[!htp]
+%   \centering
+%   \begin{tikzpicture}
+%     \node [proc] (p1) {表达式1};      
+%     \node [test, join] (t1) {表达式2?};
+%     \node [proc] (p2) {循环体};
+%     \node [proc, join] (p3) {表达式3};
+%
+%     \node [coord, above = 0.5 of p1] (c1)  {};
+%     \node [coord] (c2) at ($(p1)!0.35!(t1)$)  {};
+%     \node [coord, below = 0.25 of p3] (c3)  {};
+%     \node [coord, below = 0.2 of c3] (c4) {};
+%     \node [coord, below = 0.5 of c4] (c5) {};
+%     \node [coord, right = 0.5 of t1] (c6) {};
+%     \node [coord, left = 0.5 of t1] (ct) {};
+%     \node [coord] (c7) at (c3 -| ct)  {};
+% 
+%     \path (t1.south) -- node [near start, right] {$Y$} (p2.north);
+%     \draw [norm] (t1.south) -- (p2.north);
+%     \path (t1.east) -- node [near start, above] {$N$} (c6);
+%     \draw [norm] (t1.east) -- (c6) |- (c4) -- (c5);
+%
+%     \draw [norm] (c1) -- (p1);
+%     \draw [norm] (p3.south) |- (c7) |- (c2);
+%   \end{tikzpicture}
+%   \caption{黑色流程线流程图}
+%   \label{fig:forloopblack}
+% \end{figure}
+% \end{fsourceverb}
 %
 % \subsection{局部设置}
 % 也可以在需要的位置使用\verb|\flowchartset{}|命令进行需要的绘图局部设
