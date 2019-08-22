@@ -23,6 +23,8 @@
 \documentclass[a4paper]{ltxdoc}
 \RecordChanges
 
+\RequirePackage{texboxie}
+
 \usepackage[UTF8,scheme=chinese]{ctex}
 \usepackage{csquotes}
 \usepackage{lmodern}
@@ -30,6 +32,7 @@
 \usepackage{url}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{dtxdescribe}
 \usepackage[debug]{tikz-flowchart}
 \usepackage{float}
 % \usepackage{parskip}
@@ -45,7 +48,7 @@
 
 %\setlength{\parindent}{0pt}
 
-\def\pkg{\texttt{tikz-flowchart}}
+\def\thispkg{\pkg{tikz-flowchart}}
 \def\tkz{Ti\emph{k}Z}
 
 \begin{document}
@@ -76,16 +79,18 @@
 %
 % \GetFileInfo{tikz-flowchart.sty}
 %
-% \title{\texttt{tikz-flowchart}---\tkz 流程图绘制宏包\thanks{该文档是 \texttt{tikz-flowchart}~\fileversion, dated~\filedate 的说明文档。}}
+% \title{\thispkg{}---\tkz{}流程图绘制宏包\thanks{该文档是 \thispkg{}~\fileversion, dated~\filedate 的说明文档。}}
 % \author{耿楠\thanks{https://github.com/registor/tikz-flowchart}\\ 西北农林科技大学信息工程学院计算机科学系}
 % \date{\filedate}
 % \thispagestyle{empty}
 % \maketitle
 %
 % \begin{abstract}
-%   这是一个使用\tkz 绘制传统程序流程图的简单宏包，通过定义\texttt{proc}、\texttt{test}、\texttt{io}、\texttt{term}等\tkz 的\texttt{node}命令样式实现。
+%   这是一个使用\tkz{}绘制传统程序流程图的简单宏包，通过定义
+%   \Arg{proc}、\Arg{test}、\Arg{io}、\Arg{term}等\tkz{}的
+%   \cmd{node}命令的样式选项实现。
 % 该宏包核心代码摘录自\href{http://www.texample.net/tikz/examples/author/brent-longborough/}{Brent Longborough}设计的流程图绘制样例，
-% 参考了\texttt{tikz-imagelabels}宏包的设计思路，提供了\texttt{\textbackslash flowchartset}命令以设置绘制参数。
+% 参考了\pkg{tikz-imagelabels}宏包的设计思路，提供了\cmd{flowchartset}命令以设置绘制参数。
 % \end{abstract}
 %
 % \tableofcontents
@@ -96,13 +101,13 @@
 %
 % \section{宏包简介}
 %
-% 流程图是诸如手册、报告、论文等文档中经常用到的排版元素，\pkg{}宏包的
+% 流程图是诸如手册、报告、论文等文档中经常用到的排版元素，\thispkg{}宏包的
 % 目的是为了更为方便地实现传统流程图的绘制。\autoref{fig:forloop}是使
-% 用\pkg{} 宏包绘制|for|循环结构的一个简单示例。
+% 用\thispkg{}宏包绘制|for|循环结构的一个简单示例。
 %
 % \begin{figure}[!htp]
 %   \centering
-%   \begin{tikzpicture}[scale=0.85]
+%   \begin{tikzpicture}
 %     \node [proc] (p1) {表达式1};      
 %     \node [test, join] (t1) {表达式2?};
 %     \node [proc] (p2) {循环体};
@@ -131,21 +136,21 @@
 %
 % \autoref{fig:forloop}由如下代码绘制:
 % \begin{verbatim}
-% \begin{tikzpicture}[scale=0.85]
+% \begin{tikzpicture}
 %   % 布置结点
 %   \node [proc] (p1) {表达式1};      
 %   \node [test, join] (t1) {表达式2?};
 %   \node [proc] (p2) {循环体};
 %   \node [proc, join] (p3) {表达式3};
 %   % 布置用于连接的坐标结点，同时为其布置调试标记点。
-%   \node [coord, above = 0.5 of p1] (c1)  {}; \cmark{1}
-%   \node [coord] (c2) at ($(p1)!0.35!(t1)$)  {}; \cmark{2}
-%   \node [coord, below = 0.25 of p3] (c3)  {}; \cmark{3}
-%   \node [coord, below = 0.2 of c3] (c4) {}; \cmark{4}
-%   \node [coord, below = 0.5 of c4] (c5) {}; \cmark{5}
-%   \node [coord, right = 0.5 of t1] (c6) {}; \cmark{6}
-%   \node [coord, left = 0.5 of t1] (ct) {}; \cmark{t}
-%   \node [coord] (c7) at (c3 -| ct)  {}; \cmark{7}
+%   \node [coord, above = 0.5 of p1] (c1)  {};
+%   \node [coord] (c2) at ($(p1)!0.35!(t1)$)  {};
+%   \node [coord, below = 0.25 of p3] (c3)  {};
+%   \node [coord, below = 0.2 of c3] (c4) {};
+%   \node [coord, below = 0.5 of c4] (c5) {};
+%   \node [coord, right = 0.5 of t1] (c6) {};
+%   \node [coord, left = 0.5 of t1] (ct) {};
+%   \node [coord] (c7) at (c3 -| ct)  {};
 %   % 判断框连线，每次绘制时，先绘制一个带有一个固定
 %   % 位置标注的路径(path)，然后再绘制箭头本身(arrow)。
 %   \path (t1.south) -- node [near start, right] {$Y$} (p2.north);
@@ -158,17 +163,18 @@
 % \end{tikzpicture}
 % \end{verbatim}
 %
-% \emph{注意：}所有绘图代码都需在|tikzpicture|环境中完成。
+% \emph{注意：}所有绘图代码都需在\env{tikzpicture}环境中完成。
 % \section{使用方法}
 % \subsection{载入宏包}
-% 在导言区使用：\texttt{\textbackslash annotationimage}\oarg{debug}\marg{\pkg{}}命令
+% \DescribeOption[\thispkg{}]{debug}
+% 在导言区使用：\cmd{usepackage}\oarg{debug}\marg{\pkg{}}命令
 % 载入宏包。如果带有\oarg{debug}参数，则可以绘制用于调试的流程线转角点
 % 标记，否则，则不绘制该标记，\autoref{fig:forloopcmark}是带有
 % \oarg{debug}参数时的绘制结果。
 
 % \begin{figure}[!htp]
 %   \centering
-%   \begin{tikzpicture}[scale=0.85]
+%   \begin{tikzpicture}
 %     \node [proc] (p1) {表达式1};      
 %     \node [test, join] (t1) {表达式2?};
 %     \node [proc] (p2) {循环体};
@@ -194,6 +200,49 @@
 %   \caption{for循环流程图}
 %   \label{fig:forloopcmark}
 % \end{figure}
+%
+% \subsection{流程图样式}
+% \thispkg{}宏包定义了在\tkz{}中绘制流程图的绘图样式，以简化绘图过程。
+%
+% \begin{description}
+%   \ItemDescribeArgument[\cmd{node}]{proc}\cmd{node}命令绘制顺序执行框
+%   的样式，如：\tikz{\node[proc]{交换两个整数}}
+%   \ItemDescribeArgument[\cmd{node}]{test}\cmd{node}命令绘制判断框的样
+%   式，如：\tikz{\node[test]{$a > b$?}}
+%   \ItemDescribeArgument[\cmd{node}]{io}\cmd{node}命令绘制输入/输出框
+%   的样式，如：\tikz{\node[io]{输入两个整数}}
+%   \ItemDescribeArgument[\cmd{node}]{term}\cmd{node}命令绘制开始/结束
+%   框的样式，如：\tikz{\node[term]{开始}}
+%   \ItemDescribeArgument[\cmd{node}]{it}\cmd{node}命令绘制斜体标注
+%   的样式，如：\tikz{\node[it]{这里需要特别注意}}
+%   \ItemDescribeArgument[\cmd{node}]{connector}\cmd{node}命令绘制流程
+%   图链接点的样式，如：\tikz{\node[connector]{1}}
+%   \ItemDescribeArgument[\cmd{node}]{coord}\cmd{node}命令布置转角结点
+%   的样式，如：\tikz{\node[coord](c1){};\cmark{1}}
+%   \ItemDescribeArgument[\cmd{draw}]{lnorm}\cmd{draw}命令绘制指定颜色
+%   无箭头连线的样式，如：\tikz{\draw[lnorm](0,0)--(0.5,0)}
+%   \ItemDescribeArgument[\cmd{draw}]{lfree}\cmd{draw}命令绘制指定颜色
+%   无箭头连线的样式，如：\tikz{\draw[lfree](0,0)--(0.5,0)}
+%   \ItemDescribeArgument[\cmd{draw}]{lcong}\cmd{draw}命令绘制指定颜色
+%   无箭头连线的样式，如：\tikz{\draw[lcong](0,0)--(0.5,0)}
+%   \ItemDescribeArgument[\cmd{draw}]{norm}\cmd{draw}命令绘制指定颜色箭
+%   头连线的样式，如：\tikz{\draw[norm](0,0)--(0.5,0)}
+%   \ItemDescribeArgument[\cmd{draw}]{free}\cmd{draw}命令绘制指定颜色箭
+%   头连线的样式，如：\tikz{\draw[free](0,0)--(0.5,0)}
+%   \ItemDescribeArgument[\cmd{draw}]{dotnorm}\cmd{draw}命令绘制指定颜
+%   色流程线实心交点的样式，如：\tikz{\draw[dotnorm](0,0) circle(1.5pt)}
+%   \ItemDescribeArgument[\cmd{draw}]{dotfree}\cmd{draw}命令绘制指定颜
+%   色流程线实心交点的样式，如：\tikz{\draw[dotfree](0,0) circle(1.5pt)}
+%   \ItemDescribeArgument[\cmd{draw}]{dotcong}\cmd{draw}命令绘制指定颜
+%   色流程线实心交点的样式，如：\tikz{\draw[dotcong](0,0) circle(1.5pt)}
+%   \ItemDescribeArgument[\cmd{draw}]{cdotnorm}\cmd{draw}命令绘制指定颜
+%   色流程线空心交点的样式，如：\tikz{\draw[cdotnorm](0,0) circle(1.5pt)}
+%   \ItemDescribeArgument[\cmd{draw}]{cdotfree}\cmd{draw}命令绘制指定颜
+%   色流程线空心交点的样式，如：\tikz{\draw[cdotfree](0,0) circle(1.5pt)}
+%   \ItemDescribeArgument[\cmd{draw}]{cdotcong}\cmd{draw}命令绘制指定颜
+%   色流程线空心交点的样式，如：\tikz{\draw[cdotcong](0,0) circle(1.5pt)}
+% \end{description}
+% \section{绘制流程图}
 % \subsection{布置结点}
 % 使用类似``\verb|\node [proc](p1){表达式1};|''\tkz{} 绘图命令，采用\pkg{}
 % 定义的``\verb|proc|''、``\verb|test|''、``\verb|io|''或

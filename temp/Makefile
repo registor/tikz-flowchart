@@ -5,11 +5,11 @@ NAME = tikz-flowchart
 
 all: $(SUBDIRS)
 	xelatex $(NAME).ins
-	xelatex --interaction=nonstopmode $(NAME).dtx
-	xelatex --interaction=nonstopmode $(NAME).dtx
+	xelatex --shell-escape --interaction=nonstopmode $(NAME).dtx
+	xelatex --shell-escape --interaction=nonstopmode $(NAME).dtx
 	makeindex -s gglo.ist -o $(NAME).gls $(NAME).glo
-	xelatex --interaction=nonstopmode $(NAME).dtx
-	xelatex --interaction=nonstopmode $(NAME).dtx
+	xelatex --shell-escape --interaction=nonstopmode $(NAME).dtx
+	xelatex --shell-escape --interaction=nonstopmode $(NAME).dtx
 
 $(SUBDIRS):  ; $(MAKE) -C $@ $(MAKECMDGOALS)
 
