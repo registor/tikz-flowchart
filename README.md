@@ -11,7 +11,7 @@ Happy LaTeXing！~
 更多示例，可以参考`demo.tex`文件。
 
 ## 编译宏包及宏包说明
-如果没有`tikz-flowchart.sty`宏包文件，则可以在命令行通过运行`make`命令生成：
+如果没有`tikz-flowchart.sty`宏包文件，则可以在命令行通过运行`make`命令编译`tikz-flowchart.dtx`文件(需要有对应tikz-flowchart.ins文件)生成：
 * `tikz-flowchart.sty`宏包文件。
 * `tikz-flowchart.pdf`宏包说明文件。
 
@@ -55,7 +55,7 @@ Happy LaTeXing！~
 
 6. 该宏包还定义了`lnorm`、`lfree`和`lcong`draw样式，分别用于绘制指定颜色的无箭头的流程线；`dotnorm`、`dotfree`和`dotcong`draw样式，分别用于绘制指定颜色的实心交点；`cdotnorm`、`cdotfree`和`cdotcong`draw样式，分别用于绘制指定颜色的空心交点；`connector`draw样式，用于绘制流程线链接标记；`connect`draw样式，用于绘制非相交交汇流程线。
 
-7. 绘制样例请参阅main.tex文件中的样例代码及注释说明。
+7. 更多绘制样例请参阅demo.tex文件中的样例代码及注释说明。
 
 ## 注意
 
