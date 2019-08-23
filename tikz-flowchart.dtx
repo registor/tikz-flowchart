@@ -23,8 +23,6 @@
 \documentclass[a4paper]{ltxdoc}
 \RecordChanges
 
-\RequirePackage{texboxie}
-
 \usepackage[UTF8,scheme=chinese]{ctex}
 \usepackage{csquotes}
 \usepackage{lmodern}
@@ -50,6 +48,13 @@
 
 \def\thispkg{\pkg{tikz-flowchart}}
 \def\tkz{Ti\emph{k}Z}
+
+\newcommand{\note}[2][注意]{{%
+    \color{magenta}{\bfseries #1：}\emph{#2}}}
+\makeatletter
+\DeclareRobustCommand*\Arg[1]{\@meta{#1}}
+\def\@meta#1{$\m@th\langle$\textnormal{\textit{#1}}$\m@th\rangle$}
+\makeatother
 
 \begin{document}
   \DocInput{tikz-flowchart.dtx}
@@ -88,9 +93,9 @@
 % \begin{abstract}
 %   这是一个使用\tkz{}绘制传统程序流程图的简单宏包，通过定义
 %   \Arg{proc}、\Arg{test}、\Arg{io}、\Arg{term}等\tkz{}的
-%   \cmd{node}命令的样式选项实现。
+%   \cs{node}命令的样式选项实现。
 % 该宏包核心代码摘录自\href{http://www.texample.net/tikz/examples/author/brent-longborough/}{Brent Longborough}设计的流程图绘制样例，
-% 参考了\pkg{tikz-imagelabels}宏包的设计思路，提供了\cmd{flowchartset}命令以设置绘制参数。
+% 参考了\pkg{tikz-imagelabels}宏包的设计思路，提供了\cs{flowchartset}命令以设置绘制参数。
 % \end{abstract}
 %
 % \tableofcontents
@@ -102,8 +107,8 @@
 % \section{宏包简介}
 %
 % 流程图是诸如手册、报告、论文等文档中经常用到的排版元素，\thispkg{}宏包的
-% 目的是为了更为方便地实现传统流程图的绘制。\autoref{fig:forloop}是使
-% 用\thispkg{}宏包绘制|for|循环结构的一个简单示例。
+% 目的是为在\LaTeX{}中使用\tkz{}绘制流程图提供方便。\autoref{fig:forloop}是使
+% 用该宏包绘制|for|循环结构流程图的一个简单示例。
 %
 % \begin{figure}[!htp]
 %   \centering
@@ -135,14 +140,14 @@
 % \end{figure}
 %
 % \autoref{fig:forloop}由如下代码绘制:
-% \begin{verbatim}
+% \begin{sourceverb}
 % \begin{tikzpicture}
 %   % 布置结点
 %   \node [proc] (p1) {表达式1};      
 %   \node [test, join] (t1) {表达式2?};
 %   \node [proc] (p2) {循环体};
 %   \node [proc, join] (p3) {表达式3};
-%   % 布置用于连接的坐标结点，同时为其布置调试标记点。
+%   % 布置用于连接的坐标结点。
 %   \node [coord, above = 0.5 of p1] (c1)  {};
 %   \node [coord] (c2) at ($(p1)!0.35!(t1)$)  {};
 %   \node [coord, below = 0.25 of p3] (c3)  {};
@@ -161,13 +166,13 @@
 %   \draw [norm] (c1) -- (p1);
 %   \draw [norm] (p3.south) |- (c7) |- (c2);
 % \end{tikzpicture}
-% \end{verbatim}
+% \end{sourceverb}
 %
-% \emph{注意：}所有绘图代码都需在\env{tikzpicture}环境中完成。
+% \note{所有绘图代码都需在\env{tikzpicture}环境中完成。}
 % \section{使用方法}
 % \subsection{载入宏包}
 % \DescribeOption[\thispkg{}]{debug}
-% 在导言区使用：\cmd{usepackage}\oarg{debug}\marg{\pkg{}}命令
+% 在导言区使用：\cs{usepackage}\oarg{debug}\marg{\thispkg{}}命令
 % 载入宏包。如果带有\oarg{debug}参数，则可以绘制用于调试的流程线转角点
 % 标记，否则，则不绘制该标记，\autoref{fig:forloopcmark}是带有
 % \oarg{debug}参数时的绘制结果。
@@ -202,57 +207,57 @@
 % \end{figure}
 %
 % \subsection{流程图绘制样式}
-% \thispkg{}宏包定义了在\tkz{}中绘制流程图的绘图样式，以简化绘图过程。
+% \thispkg{}宏包定义了在\tkz{}中绘制流程图的绘图样式参数，以简化绘图过程。
 %
 % \begin{description}
-%   \ItemDescribeArgument[\cmd{node}]{proc}\cmd{node}命令绘制顺序执行框
-%   的样式，如：\tikz{\node[proc]{交换两个整数}}
-%   \ItemDescribeArgument[\cmd{node}]{test}\cmd{node}命令绘制判断框的样
-%   式，如：\tikz{\node[test]{$a > b$?}}
-%   \ItemDescribeArgument[\cmd{node}]{io}\cmd{node}命令绘制输入/输出框
-%   的样式，如：\tikz{\node[io]{输入两个整数}}
-%   \ItemDescribeArgument[\cmd{node}]{term}\cmd{node}命令绘制开始/结束
-%   框的样式，如：\tikz{\node[term]{开始}}
-%   \ItemDescribeArgument[\cmd{node}]{it}\cmd{node}命令绘制斜体标注
-%   的样式，如：\tikz{\node[it]{这里需要特别注意}}
-%   \ItemDescribeArgument[\cmd{node}]{connector}\cmd{node}命令绘制流程
-%   图链接点的样式，如：\tikz{\node[connector]{1}}
-%   \ItemDescribeArgument[\cmd{node}]{coord}\cmd{node}命令布置转角结点
+%   \ItemDescribeArgument[\cs{node}]{proc}\cs{node}命令绘制顺序执行框
+%   的样式，如：\tikz{\node[proc]{\scriptsize 交换两个整数}}
+%   \ItemDescribeArgument[\cs{node}]{test}\cs{node}命令绘制判断框的样
+%   式，如：\tikz{\node[test, minimum height=1ex]{\scriptsize $a > b$?}}
+%   \ItemDescribeArgument[\cs{node}]{io}\cs{node}命令绘制输入/输出框
+%   的样式，如：\tikz{\node[io]{\scriptsize 输入两个整数}}
+%   \ItemDescribeArgument[\cs{node}]{term}\cs{node}命令绘制开始/结束
+%   框的样式，如：\tikz{\node[term]{\scriptsize 开始}}
+%   \ItemDescribeArgument[\cs{node}]{it}\cs{node}命令绘制斜体标注
+%   的样式，如：\tikz{\node[it]{\scriptsize 这里需要特别注意}}
+%   \ItemDescribeArgument[\cs{node}]{connector}\cs{node}命令绘制流程
+%   图链接点的样式，如：\tikz{\node[connector]{\scriptsize 1}}
+%   \ItemDescribeArgument[\cs{node}]{coord}\cs{node}命令布置转角结点
 %   的样式，如：\tikz{\node[coord](c1){};\cmark{1}}
-%   \ItemDescribeArgument[\cmd{draw}]{connect}\cmd{draw}命令绘制不相交
+%   \ItemDescribeArgument[\cs{draw}]{connect}\cs{draw}命令绘制不相交
 %   的两个交汇路径的样式，如：\tikz{\node[coord](c1)at(0,0){};
 %   \node[coord](c2)at(0.3,0){};\node[coord](c3)at(0.15,-0.15){};
 %   \node[coord](c4)at(0.15,0.15){};\node[coord] (c5) at (c4 |- c1)
 %   {};\draw[lnorm](c3)--(c4);
 %   \draw[lnorm, connect=(c1) to (c2) over (c5) by 1.5pt] -- (c2);}
-%   \ItemDescribeArgument[\cmd{draw}]{lnorm}\cmd{draw}命令绘制指定颜色
+%   \ItemDescribeArgument[\cs{draw}]{lnorm}\cs{draw}命令绘制指定颜色
 %   无箭头连线的样式，如：\tikz{\draw[lnorm](0,0)--(0.5,0)}
-%   \ItemDescribeArgument[\cmd{draw}]{lfree}\cmd{draw}命令绘制指定颜色
+%   \ItemDescribeArgument[\cs{draw}]{lfree}\cs{draw}命令绘制指定颜色
 %   无箭头连线的样式，如：\tikz{\draw[lfree](0,0)--(0.5,0)}
-%   \ItemDescribeArgument[\cmd{draw}]{lcong}\cmd{draw}命令绘制指定颜色
+%   \ItemDescribeArgument[\cs{draw}]{lcong}\cs{draw}命令绘制指定颜色
 %   无箭头连线的样式，如：\tikz{\draw[lcong](0,0)--(0.5,0)}
-%   \ItemDescribeArgument[\cmd{draw}]{norm}\cmd{draw}命令绘制指定颜色箭
+%   \ItemDescribeArgument[\cs{draw}]{norm}\cs{draw}命令绘制指定颜色箭
 %   头连线的样式，如：\tikz{\draw[norm](0,0)--(0.5,0)}
-%   \ItemDescribeArgument[\cmd{draw}]{free}\cmd{draw}命令绘制指定颜色箭
+%   \ItemDescribeArgument[\cs{draw}]{free}\cs{draw}命令绘制指定颜色箭
 %   头连线的样式，如：\tikz{\draw[free](0,0)--(0.5,0)}
-%   \ItemDescribeArgument[\cmd{draw}]{dotnorm}\cmd{draw}命令绘制指定颜
+%   \ItemDescribeArgument[\cs{draw}]{dotnorm}\cs{draw}命令绘制指定颜
 %   色流程线实心交点的样式，如：\tikz{\draw[dotnorm](0,0) circle(1.5pt)}
-%   \ItemDescribeArgument[\cmd{draw}]{dotfree}\cmd{draw}命令绘制指定颜
+%   \ItemDescribeArgument[\cs{draw}]{dotfree}\cs{draw}命令绘制指定颜
 %   色流程线实心交点的样式，如：\tikz{\draw[dotfree](0,0) circle(1.5pt)}
-%   \ItemDescribeArgument[\cmd{draw}]{dotcong}\cmd{draw}命令绘制指定颜
+%   \ItemDescribeArgument[\cs{draw}]{dotcong}\cs{draw}命令绘制指定颜
 %   色流程线实心交点的样式，如：\tikz{\draw[dotcong](0,0) circle(1.5pt)}
-%   \ItemDescribeArgument[\cmd{draw}]{cdotnorm}\cmd{draw}命令绘制指定颜
+%   \ItemDescribeArgument[\cs{draw}]{cdotnorm}\cs{draw}命令绘制指定颜
 %   色流程线空心交点的样式，如：\tikz{\draw[cdotnorm](0,0) circle(1.5pt)}
-%   \ItemDescribeArgument[\cmd{draw}]{cdotfree}\cmd{draw}命令绘制指定颜
+%   \ItemDescribeArgument[\cs{draw}]{cdotfree}\cs{draw}命令绘制指定颜
 %   色流程线空心交点的样式，如：\tikz{\draw[cdotfree](0,0) circle(1.5pt)}
-%   \ItemDescribeArgument[\cmd{draw}]{cdotcong}\cmd{draw}命令绘制指定颜
+%   \ItemDescribeArgument[\cs{draw}]{cdotcong}\cs{draw}命令绘制指定颜
 %   色流程线空心交点的样式，如：\tikz{\draw[cdotcong](0,0) circle(1.5pt)}
 % \end{description}
 %
 % \subsection{样式参数设置命令}
-% \DescribeMacro{flowchartset}
-% \thispkg{}宏包定义了\cmd{flowchartset}命令，该命令用于设置流程图各元
-% 素的的绘图属性，详情见如下代码注释。
+% \DescribeMacro{\flowchartset}
+% \thispkg{}宏包定义了\cs{flowchartset}命令，该命令用于设置流程图各元
+% 素的绘制属性，详情见如下代码注释。
 %
 % \begin{sourceverb}[xleftmargin=0em]
 % \flowchartset{
@@ -278,40 +283,40 @@
 % \end{sourceverb}
 %
 % 这些参数设置方式与常规的\tkz{}参数设置类似，即可以多个参数一起设置，
-% 也可以分开单独设置。\cmd{flowchartset}命令可以在导言区进行全局设置，
+% 也可以分开单独设置。\cs{flowchartset}命令可以在导言区进行全局设置，
 % 也可以在需要的位置进行局部设置。
 % \section{流程图绘制步骤}
 % \subsection{布置流程框结点}
-% 使用类似``|\node [proc](p1){表达式1};|''绘图命令，采用\thispkg{}
-% 定义的``|proc|''、``|test|''、``|io|''或``|term|''的样式参数布置需要的流程框结点。
+% 使用类似``|\node [proc](p1){表达式1};|''命令，采用\thispkg{}
+% 定义的``|proc|''、``|test|''、``|io|''或``|term|''样式参数布置需要的流程框结点。
 %
 %
 % 在布置结点时，如果前一个结点不是``|test|''样式，则可以使用
 % ``|join|''参数自动与前一个结点建立连接，如
-% ``|\node [proc, join] (p3) {表达式3};|''，同时绘制对应流程线。
+% ``|\node [proc, join] (p3) {表达式3};|''，并同时绘制对应流程线。
 %
 % 另外，可根据需要对结点进行命名(如``|p1|''、
 % ``|t1|''等)，以便引用该结点。
 %
 % \subsection{布置坐标点}
 % 使用类似``|\node[coord,above=0.5 of p1](c1){};\cmark{1}|''
-% 绘图命令，用``|coord|''样式参数布置其它坐标点
-% (主要用于流程线的转接)。同时，也可以使用``\cmd{cmark}''命令为该点作标
-% 记，以便绘制时的进行调试。在带\oarg{debug}可选参数引入
+% 命令，用``|coord|''样式参数布置其它坐标点
+% (主要用于流程线的转接)。同时，可以使用``\cs{cmark}''命令为该点作标
+% 记，在带\oarg{debug}可选参数引入
 % 宏包时，则绘制标记点，若无\oarg{debug}参数，则不绘制标记点。
 %
 % \subsection{绘制流程线}
 % 首先使用类似``|\path(t1.south)--node[near start,right]{$Y$}(p2.north);|''
-% 的路径命令绘制流程线标注。
+% 的路径命令绘制流程线的标注文字。
 %
 % 然后使用类似``\verb!\draw[norm](t1.east)--(c6)|-(c4)--(c5);!''
 % 绘制命令绘制带有箭头的流程线。
 %
 % 可以使用``|lnorm|''、``|lfree|''或
-% ``|lcong|''指定颜色样式绘制无箭头的流程线，用``|norm|''、
-% ``|free|''或``|cong|''指定颜色样式绘制有箭头的流程线。
+% ``|lcong|''绘制指定颜色的无箭头流程线，用``|norm|''、
+% ``|free|''或``|cong|''绘制指定颜色的有箭头流程线。
 %
-% 建议先绘制南北方向流程线，再绘制东西方向流程线。
+% \note[建议]{先绘制南北方向流程线，再绘制东西方向流程线}。
 %
 % 可以使用``|dotnorm|''、``|dotfree|''和
 % ``|dotcong|''样式绘制流程线实心交点，用``|cdotnorm|''、
@@ -320,31 +325,29 @@
 % 对于不相交的流程线，可以用``|connect|''样式进行绘制。
 %
 % \subsection{绘制其它图形}
-% 在使用\cmd{node}、\cmd{path}、\cmd{draw}等命令时，可以同时使用任何
+% 在使用\cs{node}、\cs{path}、\cs{draw}等命令时，可以同时使用任何
 % 合法的\tkz{}参数，同时，也可以使用任何合法\tkz{}命令绘制需要的其它图形。
 %
 % \section{改变绘图属性}
 %
 % \subsection{改变流程线颜色}
-% 通过在导言区使用\cmd{flowchartset}命令全局设置需要的绘图属性，
-% 可以仅指定需要的参数，如：
+% 通过在导言区使用\cs{flowchartset}命令可以全局设置需要的绘图属性，
+% 如：
 % \begin{sourceverb}
 % \usepackage{tikz-flowchart}
 % \flowchartset{
-%   free color = green,  % 自由连线颜色(默认取green)
 %   norm color = black,  % 将常规连线颜色设置为black
-%   cong color = red,    % 关联连线颜色(默认取red)
 % }
 % ......
 % \end{sourceverb}
 %
-% 可以指定``\verb|norm|''类型的颜色为``\verb|black|''，得到
+% \note{可以多次使用\cs{flowchartset}命令，每次可仅指定需要的参数。}
+%
+% 例如，仅指定``\verb|norm|''类型的颜色为``\verb|black|''，得到
 % \autoref{fig:forloopblack}所示的黑色流程线。
 %
 % \flowchartset{
-%   free color = green,
 %   norm color = black,
-%   cong color = red,
 % }
 %   
 % \begin{figure}[!htp]
@@ -377,8 +380,7 @@
 % \end{figure}
 %
 % \subsection{改变流程框填充色和宽度}
-% 也可以在任意需要的地方使用\cmd{flowchartset}命令绘图属性的局部设置。
-%
+% 也可以在需要时用\cs{flowchartset}命令进行绘图属性的局部设置。
 % 如，可以用如下代码局部改变各类流程框的填充颜色和文字宽度：
 % \begin{sourceverb}
 %   \flowchartset{
@@ -387,7 +389,7 @@
 %     io fill color = blue!30,
 %     term fill color = red!30,
 %     proc text width = 6em,
-%     test text width = 10em,
+%     test text width = 5em,
 %   }
 %   \begin{tikzpicture}
 %     ...
@@ -402,7 +404,7 @@
 %   io fill color = blue!30,
 %   term fill color = red!30,
 %   proc text width = 6em,
-%   test text width = 10em,
+%   test text width = 5em,
 % }
 % \begin{figure}[!htp]
 %   \centering
@@ -434,13 +436,12 @@
 % \end{figure}
 %
 % \subsection{使用\env{tikzpicture}环境的绘图参数}
-% 可以使用任意合法的\env{tikzpicture}环境参数，如，可以用如下代码使用
-% \env{tikzpicture}环境参数绘制流程图：
+% 可以使用任意合法的\env{tikzpicture}环境参数，如，可使用
+% \env{tikzpicture}环境的参数进行流程图缩放及字号设置：
 %
 % \begin{sourceverb}
-%   \begin{tikzpicture}[scale=0.5,
-%          every node/.append style = {transform shape},
-%          font=\scriptsize]
+%   \begin{tikzpicture}[font=\scriptsize, scale=0.5,
+%          every node/.append style = {transform shape}]
 %     ...
 %   \end{tikzpicture}
 % \end{sourceverb}
@@ -449,8 +450,8 @@
 %
 % \begin{figure}[!htp]
 %   \centering
-%   \begin{tikzpicture}[scale=0.5, every node/.append style = {transform shape},
-%                       font=\scriptsize]
+%   \begin{tikzpicture}[font=\scriptsize, scale=0.5,
+%          every node/.append style = {transform shape}]
 %     \node [proc] (p1) {表达式1};      
 %     \node [test, join] (t1) {表达式2?};
 %     \node [proc] (p2) {循环体};
@@ -478,19 +479,17 @@
 % \end{figure}
 %
 % \subsection{使用绘图命令参数}
-% 也可以使用任意\cmd{node}、\cmd{draw}等绘图命令的合法参数，如：
+% 可以使用任意\cs{node}、\cs{draw}等绘图命令的合法参数调整当前绘图属性，如：
 %
-% \begin{sourceverb}
-%   \begin{tikzpicture}[scale=0.5,
-%     ...
-%     \node [test, join, text width= 5em] (t1) {表达式2?};
-%     ...
-%     \draw [norm, dash dot] (t1.east) -- (c6) |- (c4) -- (c5);
-%     ...
-%     \draw [norm, dashed] (p3.south) |- (c7) |- (c2);
-%     ...
-%   \end{tikzpicture}
-% \end{sourceverb}
+% \begin{sourcedisplay}
+%   ...\\
+%   \cs{node}[test, join, \textcolor{red}{text width= 5em}](t1) \{表达式2?\};\\
+%   ...\\
+%   \cs{draw}[norm, \textcolor{red}{dash dot}](t1.east) -- (c6) \verb!|!- (c4) -- (c5);\\
+%   ...\\
+%   \cs{draw}[norm, \textcolor{red}{dashed}](p3.south) \verb!|!- (c7) \verb!|!- (c2);\\
+%   ...\\
+% \end{sourcedisplay}
 %
 % 绘制结果如\autoref{fig:forloopdasheline}所示。
 %
@@ -527,22 +526,23 @@
 % \subsubsection{冒泡排序流程图}
 % 如下代码绘制如\autoref{fig:bubllesort}所示的冒泡排序流程图。
 %
-% \begin{sourceverb}
+% \begin{sourceverb}[xleftmargin=0em]
 % \begin{figure}[!htp]
 %   \centering
 %   \begin{tikzpicture}
 %     % 布置结点单元
 %     \node [term] (st) {Begin};
-%     \node [proc, text width = 6em, join] (p1) {|int i, j|\\|int counter|};
-%     \node [proc, join] (p2) {|i = 0|\\|counter = 0|};
-%     \node [test, join] (t1) {|i < n - 1|};
-%     \node [proc] (p3) {|j = 0|};
-%     \node [test, join] (t2) {|j < n - 1|};
-%     \node [test, text width = 6em] (t3) {|a[j] > a[j + 1]|};
-%     \node [proc, text width = 8em] (p4) {|Swap(a[j], a[j + 1])|};
-%     \node [proc, join] (p5) {|counter++|\\|j++|};
-%     \node [proc] (p6) {|i++|};
-%     \node [proc, text width = 6em] (p7) {|return counter|};
+%     \node [proc, text width = 6em, join] (p1) {\verb|int i, j|\\
+%                                                \verb|int counter|};
+%     \node [proc, join] (p2) {\verb|i = 0|\\\verb|counter = 0|};
+%     \node [test, join] (t1) {\verb|i < n - 1|};
+%     \node [proc] (p3) {\verb|j = 0|};
+%     \node [test, join] (t2) {\verb|j < n - 1|};
+%     \node [test, text width = 6em] (t3) {\verb|a[j] > a[j + 1]|};
+%     \node [proc, text width = 8em] (p4) {\verb|Swap(a[j], a[j + 1])|};
+%     \node [proc, join] (p5) {\verb|counter++|\\\verb|j++|};
+%     \node [proc] (p6) {\verb|i++|};
+%     \node [proc, text width = 6em] (p7) {\verb|return counter|};
 %     \node [term, join] (end) {End};
 %
 %     % 布置用于连接的坐标结点，同时为其布置调试标记点。
@@ -660,23 +660,23 @@
 % \newpage
 % \subsubsection{素数判定流程图}
 % 如下代码绘制如\autoref{fig:primejudge}所示的素数判定流程图。
-
-% \begin{sourceverb}
+%
+% \begin{sourceverb}[xleftmargin=0em]
 % \begin{figure}[!htp]
 %   \centering
 %   \begin{tikzpicture}
 %     % 布置结点单元
 %     \node [term] (st) {开始};
-%     \node [proc, join] (p1) {|int divisor|};       
-%     \node [test, join] (t1) {|n <= 1|};
-%     \node [proc] (p2) {|divisor = 2|};
-%     \node [test, join] (t2) {|divisor * divisor <= n|};
-%     \node [test] (t3) {|n % divisor == 0|};
-%     \node [proc] (p3) {|divisor++|};
+%     \node [proc, join] (p1) {\verb|int divisor|};       
+%     \node [test, join] (t1) {\verb|n <= 1|};
+%     \node [proc] (p2) {\verb|divisor = 2|};
+%     \node [test, join] (t2) {\verb|divisor * divisor <= n|};
+%     \node [test] (t3) {\verb|n % divisor == 0|};
+%     \node [proc] (p3) {\verb|divisor++|};
 %     \node [term, below = 1.6 of p3] (end) {结束};
-%     \node [proc, left = 4.8 of t2] (p4) {|return 0|};
-%     \node [proc, right = 3.5 of p3] (p5) {|return 0|};
-%     \node [proc, right = 5.8 of t3] (p6) {|return 1|};
+%     \node [proc, left = 4.8 of t2] (p4) {\verb|return 0|};
+%     \node [proc, right = 3.5 of p3] (p5) {\verb|return 0|};
+%     \node [proc, right = 5.8 of t3] (p6) {\verb|return 1|};
 %
 %     % 布置用于连接的坐标结点，同时为其布置调试标记点。
 %     \node [coord] (c1) at ($(p2.south)!0.5!(t2.north)$)  {};
@@ -781,20 +781,20 @@
 % \newpage
 % \subsubsection{求最大公约数流程图}
 % 如下代码绘制如\autoref{fig:getgcd}所示的求最大公约数流程图。
-
-% \begin{sourceverb}
+%
+% \begin{sourceverb}[xleftmargin=0em]
 % \begin{figure}[!htp]
 %   \centering
 %   \begin{tikzpicture}
 %     % 布置结点单元
 %     % 用异或交换两个整数
 %     \node [term] (st) {Begin};
-%     \node [proc, join] (p1) {|int r = 0|};
-%     \node [test, join] (t1) {|m < n|};        
-%     \node [proc] (p2) {|m ^= n|\\|n ^= m|\\|m ^= n|};        
-%     \node [test, join] (t2) {|n != 0|};
-%     \node [proc] (p3) {|r = m % n|\\|m = n|\\|n = r|};        
-%     \node [proc] (p4) {|return m|};
+%     \node [proc, join] (p1) {\verb|int r = 0|};
+%     \node [test, join] (t1) {\verb|m < n|};        
+%     \node [proc] (p2) {\verb|m ^= n|\\\verb|n ^= m|\\\verb|m ^= n|};        
+%     \node [test, join] (t2) {\verb|n != 0|};
+%     \node [proc] (p3) {\verb|r = m % n|\\\verb|m = n|\\\verb|n = r|};        
+%     \node [proc] (p4) {\verb|return m|};
 %     \node [term, join] (end) {End};
 %
 %     % 布置用于连接的坐标结点，同时为其布置调试标记点。
